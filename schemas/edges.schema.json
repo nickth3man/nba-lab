@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NBA Teammate Network Edges",
+  "description": "JSON Schema for NBA teammate network graph edges",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "source", "target", "weight", "teams", "total_days", "size"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Unique edge identifier"
+      },
+      "source": {
+        "type": "string",
+        "description": "Source player ID"
+      },
+      "target": {
+        "type": "string",
+        "description": "Target player ID"
+      },
+      "weight": {
+        "type": "number",
+        "minimum": 0,
+        "description": "Edge weight (seasons played together)"
+      },
+      "teams": {
+        "type": "array",
+        "description": "Shared team tenures",
+        "items": {
+          "type": "object",
+          "required": ["team_id", "team_name", "team_abbreviation", "seasons", "overlap_days"],
+          "properties": {
+            "team_id": {
+              "type": "string",
+              "description": "Unique team identifier"
+            },
+            "team_name": {
+              "type": "string",
+              "description": "Full team name"
+            },
+            "team_abbreviation": {
+              "type": "string",
+              "description": "Team abbreviation (e.g., 'LAL', 'BOS')"
+            },
+            "seasons": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}$"
+              },
+              "description": "Season identifiers (e.g., '2019-20')"
+            },
+            "overlap_days": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Days overlapped at this team"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "total_days": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Total days teammates overlapped"
+      },
+      "size": {
+        "type": "number",
+        "minimum": 0,
+        "description": "Visual edge size"
+      }
+    },
+    "additionalProperties": false
+  }
+}
