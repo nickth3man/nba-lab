@@ -192,7 +192,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 > Implementation + Test = ONE Task. Never separate.
 > EVERY task MUST have: Recommended Agent Profile + Parallelization info + QA Scenarios.
 
-- [ ] 1. Test Infrastructure + Project Scaffolding
+- [x] 1. Test Infrastructure + Project Scaffolding
 
   **What to do**:
   - Create project directory structure: `scripts/`, `data/`, `src/`, `tests/python/`, `tests/js/`
@@ -266,7 +266,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `pytest.ini`, `jest.config.js`, `package.json`, `tests/`, `scripts/`, `src/`
   - Pre-commit: `pytest tests/python/ -v && npx jest --passWithNoTests`
 
-- [ ] 2. Database Validation + Data Quality Checks
+- [x] 2. Database Validation + Data Quality Checks
 
   **What to do**:
   - Write Python script `scripts/validate_db.py` that runs data quality checks
@@ -343,7 +343,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `scripts/validate_db.py`, `tests/python/test_validate_db.py`, `data/validation_report.json`
   - Pre-commit: `pytest tests/python/test_validate_db.py -v`
 
-- [ ] 3. Teammate Overlap SQL + Materialized Table
+- [x] 3. Teammate Overlap SQL + Materialized Table
 
   **What to do**:
   - Write TDD test first: `tests/python/test_teammate_sql.py` with known fixture data
@@ -443,7 +443,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `scripts/extract_teammates.py`, `tests/python/test_teammate_sql.py`
   - Pre-commit: `pytest tests/python/test_teammate_sql.py -v`
 
-- [ ] 4. Graph Schema Definition + JSON Type Contracts
+- [x] 4. Graph Schema Definition + JSON Type Contracts
 
   **What to do**:
   - Write TDD test first: `tests/python/test_graph_schema.py` and `tests/js/test-graph-schema.test.ts`
@@ -513,7 +513,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/lib/graph-types.ts`, `schemas/nodes.schema.json`, `schemas/edges.schema.json`, `scripts/validate_json_schema.py`, `tests/`
   - Pre-commit: `pytest tests/python/test_graph_schema.py -v && npx jest tests/js/test-graph-schema.test.ts`
 
-- [ ] 5. Graph Construction (NetworkX Nodes + Edges)
+- [x] 5. Graph Construction (NetworkX Nodes + Edges)
 
   **What to do**:
   - Write TDD test first: `tests/python/test_graph_construction.py`
@@ -597,7 +597,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `scripts/build_graph.py`, `tests/python/test_graph_construction.py`
   - Pre-commit: `pytest tests/python/test_graph_construction.py -v`
 
-- [ ] 6. Centrality Metrics Computation
+- [x] 6. Centrality Metrics Computation
 
   **What to do**:
   - Write TDD test first: `tests/python/test_centrality_metrics.py`

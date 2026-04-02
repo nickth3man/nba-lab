@@ -2,8 +2,64 @@
   "active_plan": "C:\\Users\\nicolas\\Documents\\GitHub\\lab\\nba\\.sisyphus\\plans\\nba-teammate-network.md",
   "started_at": "2026-04-02T22:30:29.876Z",
   "session_ids": [
-    "ses_2afae3920ffeerln80O1FdU0yY"
+    "ses_2afae3920ffeerln80O1FdU0yY",
+    "ses_2afad88bdffeGoOta19xk6XU16",
+    "ses_2afad88daffe0DXZLaFo8h3JIW",
+    "ses_2afa72ff8ffef3O4y3ySeOUdvi",
+    "ses_2afa7308bffeI6wluqfF680DEP",
+    "ses_2afa3b97affeMIlfZ5jUUWNeVT",
+    "ses_2afa3b957ffeqMapz1gAjTUO5o",
+    "ses_2af9271c3ffe2Ir5ML1pVov3HS",
+    "ses_2af927167ffe9sQbdGYxfQ19Q2",
+    "ses_2af8ca349ffegzdyHDf9HWoFum",
+    "ses_2af8ca3b3ffeaAlmeVS2eijQRg",
+    "ses_2af85f6a4ffeSO7x5RnKz4RJXu",
+    "ses_2af85f6efffenIB4QcbI7DDy9Z"
   ],
   "plan_name": "nba-teammate-network",
-  "agent": "atlas"
+  "agent": "atlas",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "Test Infrastructure + Project Scaffolding",
+      "session_id": "ses_2afad88daffe0DXZLaFo8h3JIW",
+      "updated_at": "2026-04-02T22:37:05.265Z"
+    },
+    "todo:2": {
+      "task_key": "todo:2",
+      "task_label": "2",
+      "task_title": "Database Validation + Data Quality Checks",
+      "session_id": "ses_2afa7308bffeI6wluqfF680DEP",
+      "updated_at": "2026-04-02T22:41:28.665Z"
+    },
+    "todo:3": {
+      "task_key": "todo:3",
+      "task_label": "3",
+      "task_title": "Teammate Overlap SQL + Materialized Table",
+      "session_id": "ses_2afa3b957ffeqMapz1gAjTUO5o",
+      "updated_at": "2026-04-02T22:49:46.113Z"
+    },
+    "todo:4": {
+      "task_key": "todo:4",
+      "task_label": "4",
+      "task_title": "Graph Schema Definition + JSON Type Contracts",
+      "session_id": "ses_2af927167ffe9sQbdGYxfQ19Q2",
+      "updated_at": "2026-04-02T23:06:15.847Z"
+    },
+    "todo:5": {
+      "task_key": "todo:5",
+      "task_label": "5",
+      "task_title": "Graph Construction (NetworkX Nodes + Edges)",
+      "session_id": "ses_2af8ca3b3ffeaAlmeVS2eijQRg",
+      "updated_at": "2026-04-02T23:13:36.278Z"
+    },
+    "todo:6": {
+      "task_key": "todo:6",
+      "task_label": "6",
+      "task_title": "Centrality Metrics Computation",
+      "session_id": "ses_2af85f6efffenIB4QcbI7DDy9Z",
+      "updated_at": "2026-04-02T23:28:39.862Z"
+    }
+  }
 }
