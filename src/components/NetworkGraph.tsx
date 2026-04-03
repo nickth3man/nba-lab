@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { SigmaContainer, useLoadGraph, useRegisterEvents, useSigma, useSetSettings } from '@react-sigma/core';
 import Graph from 'graphology';
 import { loadGraphData } from '@/lib/graph-data';
@@ -17,6 +17,10 @@ interface NetworkGraphProps {
   externalGraphData?: GraphData | null;
   onGraphDataLoaded?: (data: GraphData) => void;
   highlightedNode?: string | null;
+}
+
+function getEdgeLookupKey(source: string, target: string): string {
+  return source < target ? `${source}::${target}` : `${target}::${source}`;
 }
 
 function useDebouncedHandler<T extends (...args: unknown[]) => void>(
@@ -96,6 +100,53 @@ function GraphLoader({
   const sigma = useSigma();
   const setSettings = useSetSettings();
   const [currentHighlighted, setCurrentHighlighted] = useState<string | null>(null);
+
+  const nodeLookup = useMemo(() => {
+    const lookup = new Map<string, NodeData>();
+
+    data?.nodes.forEach(node => {
+      lookup.set(node.id, node);
+    });
+
+    return lookup;
+  }, [data]);
+
+  const edgeLookup = useMemo(() => {
+    const lookup = new Map<string, EdgeData>();
+
+    data?.edges.forEach(edge => {
+      lookup.set(getEdgeLookupKey(edge.source, edge.target), edge);
+    });
+
+    return lookup;
+  }, [data]);
+
+  const connectedEdgeLookup = useMemo(() => {
+    const lookup = new Map<string, EdgeData[]>();
+
+    data?.edges.forEach(edge => {
+      const sourceEdges = lookup.get(edge.source);
+      const targetEdges = lookup.get(edge.target);
+
+      if (sourceEdges) {
+        sourceEdges.push(edge);
+      } else {
+        lookup.set(edge.source, [edge]);
+      }
+
+      if (targetEdges) {
+        targetEdges.push(edge);
+      } else {
+        lookup.set(edge.target, [edge]);
+      }
+    });
+
+    return lookup;
+  }, [data]);
+
+  const getNodeData = useCallback((nodeId: string) => {
+    return nodeLookup.get(nodeId) || null;
+  }, [nodeLookup]);
   
   const lodRef = useRef<ReturnType<typeof createLODManager> | null>(null);
   const { updateLOD, getLODLevel } = useLODManagement(sigma as unknown as SigmaInstance | null, lodRef);
@@ -111,12 +162,12 @@ function GraphLoader({
       
       const graph = sigma.getGraph();
       graph.nodes().forEach(nodeId => {
-        const originalSize = data?.nodes.find(n => n.id === nodeId)?.size || 5;
+        const originalSize = getNodeData(nodeId)?.size || 5;
         graph.setNodeAttribute(nodeId, 'size', originalSize * sizeMultiplier);
       });
       
       setSettings({ renderLabels: showLabels });
-    }, [sigma, data, updateLOD, setSettings]),
+    }, [sigma, getNodeData, updateLOD, setSettings]),
     100
   );
 
@@ -147,9 +198,9 @@ function GraphLoader({
 
     registerEvents({
       enterNode: ({ node }) => {
-        const nodeData = data.nodes.find(n => n.id === node);
+        const nodeData = getNodeData(node);
         if (onNodeHover) {
-          onNodeHover(node, nodeData || null);
+          onNodeHover(node, nodeData);
         }
       },
       leaveNode: () => {
@@ -158,9 +209,9 @@ function GraphLoader({
         }
       },
       clickNode: ({ node }) => {
-        const nodeData = data.nodes.find(n => n.id === node);
+        const nodeData = getNodeData(node);
         if (onNodeClick) {
-          onNodeClick(node, nodeData || null);
+          onNodeClick(node, nodeData);
         }
       },
       clickStage: () => {
@@ -171,7 +222,7 @@ function GraphLoader({
       downNode: debouncedHandleZoom,
       downStage: debouncedHandleZoom,
     });
-  }, [data, loadGraph, registerEvents, onNodeHover, onNodeClick, debouncedHandleZoom]);
+  }, [data, loadGraph, registerEvents, onNodeHover, onNodeClick, debouncedHandleZoom, getNodeData]);
 
   useEffect(() => {
     if (highlightedNode !== currentHighlighted) {
@@ -182,15 +233,13 @@ function GraphLoader({
       const graph = sigma.getGraph();
 
       graph.nodes().forEach(nodeId => {
-        graph.setNodeAttribute(nodeId, 'color', data?.nodes.find(n => n.id === nodeId)?.color || '#808080');
-        graph.setNodeAttribute(nodeId, 'size', data?.nodes.find(n => n.id === nodeId)?.size || 5);
+        const originalNode = nodeLookup.get(nodeId);
+        graph.setNodeAttribute(nodeId, 'color', originalNode?.color || '#808080');
+        graph.setNodeAttribute(nodeId, 'size', originalNode?.size || 5);
       });
 
       graph.forEachEdge((edgeId, _attributes, source, target) => {
-        const originalEdge = data?.edges.find(edge => (
-          (edge.source === source && edge.target === target) ||
-          (edge.source === target && edge.target === source)
-        ));
+        const originalEdge = edgeLookup.get(getEdgeLookupKey(source, target));
 
         graph.setEdgeAttribute(edgeId, 'color', '#cccccc');
         graph.setEdgeAttribute(edgeId, 'size', Math.max(0.1, Math.min(originalEdge?.size || 0.5, 2)));
@@ -200,7 +249,7 @@ function GraphLoader({
         return;
       }
 
-      const connectedEdges = data?.edges.filter(e => e.source === highlightedNode || e.target === highlightedNode) || [];
+      const connectedEdges = connectedEdgeLookup.get(highlightedNode) || [];
       const connectedNodes = new Set<string>();
       connectedNodes.add(highlightedNode);
       connectedEdges.forEach(e => {
@@ -209,12 +258,14 @@ function GraphLoader({
       });
 
       graph.nodes().forEach(nodeId => {
+        const originalNode = nodeLookup.get(nodeId);
+
         if (connectedNodes.has(nodeId)) {
-          graph.setNodeAttribute(nodeId, 'color', data?.nodes.find(n => n.id === nodeId)?.color || '#808080');
-          graph.setNodeAttribute(nodeId, 'size', (data?.nodes.find(n => n.id === nodeId)?.size || 5) * 1.5);
+          graph.setNodeAttribute(nodeId, 'color', originalNode?.color || '#808080');
+          graph.setNodeAttribute(nodeId, 'size', (originalNode?.size || 5) * 1.5);
         } else {
           graph.setNodeAttribute(nodeId, 'color', '#cccccc');
-          graph.setNodeAttribute(nodeId, 'size', (data?.nodes.find(n => n.id === nodeId)?.size || 5) * 0.5);
+          graph.setNodeAttribute(nodeId, 'size', (originalNode?.size || 5) * 0.5);
         }
       });
 
@@ -233,7 +284,7 @@ function GraphLoader({
         graph.setEdgeAttribute(edgeKey[0], edgeKey[1], 'size', (edge.size || 1) * 2);
       });
     }
-  }, [highlightedNode, sigma, data, currentHighlighted]);
+  }, [highlightedNode, sigma, currentHighlighted, nodeLookup, edgeLookup, connectedEdgeLookup]);
 
   return null;
 }
