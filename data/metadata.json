@@ -1,0 +1,15 @@
+{
+  "exported_at": "2026-04-03T04:40:52.436412Z",
+  "node_count": 5115,
+  "edge_count": 111483,
+  "file_sizes": {
+    "nodes_bytes": 1505877,
+    "edges_bytes": 29829693,
+    "total_bytes": 31335570,
+    "total_mb": 29.88
+  },
+  "weight_range": {
+    "min": 1,
+    "max": 18
+  }
+}
