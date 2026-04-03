@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import type { GraphData, NodeData, EdgeData } from '@/lib/graph-types';
 import { searchPlayers } from '@/lib/graph-data';
+import type { EdgeData, GraphData, NodeData } from '@/lib/graph-types';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface ShortestPathProps {
   data: GraphData;
@@ -35,16 +35,13 @@ function findTeamConnection(
   edges: EdgeData[]
 ): { team: string; edge: EdgeData } | null {
   for (const edge of edges) {
-    if (
+    const isMatchingEdge =
       (edge.source === sourceId && edge.target === targetId) ||
-      (edge.source === targetId && edge.target === sourceId)
-    ) {
-      if (edge.teams && edge.teams.length > 0) {
-        const firstTeam = edge.teams[0];
-        if (firstTeam) {
-          return { team: firstTeam.team_abbreviation, edge };
-        }
-      }
+      (edge.source === targetId && edge.target === sourceId);
+    const firstTeam = edge.teams?.[0];
+
+    if (isMatchingEdge && edge.teams && edge.teams.length > 0 && firstTeam) {
+      return { team: firstTeam.team_abbreviation, edge };
     }
   }
   return null;
@@ -427,7 +424,7 @@ export default function ShortestPath({
                       key={player.id}
                       data-testid={`path-from-result-${index}`}
                       role="option"
-                      aria-selected={isSelected}
+                      aria-selected={isSelected ? 'true' : 'false'}
                       tabIndex={0}
                       style={{
                         ...resultItemStyle,
@@ -505,7 +502,7 @@ export default function ShortestPath({
                       key={player.id}
                       data-testid={`path-to-result-${index}`}
                       role="option"
-                      aria-selected={isSelected}
+                      aria-selected={isSelected ? 'true' : 'false'}
                       tabIndex={0}
                       style={{
                         ...resultItemStyle,

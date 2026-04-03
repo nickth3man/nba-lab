@@ -5,6 +5,7 @@
 > **Quick Summary**: Build an interactive network visualization of all NBA players (1946-2026) who were teammates — nodes are players, edges represent shared tenure with team/duration attributes. Pre-compute graph in Python (SQL self-join → NetworkX metrics → JSON), serve via Next.js SSG, render with Sigma.js v3 + WebGL.
 >
 > **Deliverables**:
+>
 > - Python pre-computation pipeline (SQL extraction, graph construction, metrics, JSON export)
 > - Next.js static site with Sigma.js v3 WebGL network visualization
 > - Interactive features: search, hover tooltips, click drill-down, shortest-path finder, era/team/position filters
@@ -20,23 +21,29 @@
 ## Context
 
 ### Original Request
+
 "I want to use the database in db/ to create a network of all players who were on a team at the same time, and what team, and how long they were on that team, and visualize it."
 
 ### Interview Summary
+
 **Key Discussions**:
+
 - Scope: All 80 seasons (1946-47 to 2025-26), ~5,115 players, ~30 teams, 23,428 roster entries
 - Test strategy: TDD (tests first) — includes test infrastructure setup
 - Deployment: Static site on Vercel/Netlify (Next.js SSG)
 - Stack: Python (pre-computation) → Next.js (frontend) → Sigma.js v3 + Graphology + WebGL (rendering)
 
 **Research Findings**:
+
 - Oracle confirmed SQL self-join with CTE for date overlap computation, indexing strategy, graph data model
 - Librarian confirmed Sigma.js v3 + WebGL handles 100K+ edges at 60fps; vis-network/Cytoscape cap at ~5K on Canvas
 - ~60,000-100,000 unique teammate edges after self-join and aggregation
 - Two-phase layout: Louvain community detection → ForceAtlas2, pre-computed in Python
 
 ### Metis Review
+
 **Identified Gaps** (addressed):
+
 - Data validation task added before graph computation
 - Minimum overlap threshold (14 days) to filter noise from brief contracts
 - JSON schema locked before implementation
@@ -49,9 +56,11 @@
 ## Work Objectives
 
 ### Core Objective
+
 Create an interactive, performant network visualization showing every NBA teammate relationship across 80 seasons of history, with search, filtering, and path-finding capabilities.
 
 ### Concrete Deliverables
+
 - `scripts/build_graph.py` — Python pre-computation pipeline (SQL → graph → JSON)
 - `data/nodes.json`, `data/edges.json`, `data/metrics.json` — Pre-computed graph data
 - `src/app/page.tsx` — Next.js page with Sigma.js visualization
@@ -64,6 +73,7 @@ Create an interactive, performant network visualization showing every NBA teamma
 - `vercel.json` / `netlify.toml` — Deployment config
 
 ### Definition of Done
+
 - [ ] `python scripts/build_graph.py` completes successfully, produces valid JSON
 - [ ] `npm run build` succeeds with zero errors
 - [ ] `npm run test` passes all tests (100% of TDD tests)
@@ -71,6 +81,7 @@ Create an interactive, performant network visualization showing every NBA teamma
 - [ ] Deployed to Vercel/Netlify, accessible via URL
 
 ### Must Have
+
 - Full 80-season data (1946-2026)
 - WebGL rendering (Sigma.js v3) — no Canvas fallback as primary
 - Search, hover tooltips, click drill-down
@@ -80,6 +91,7 @@ Create an interactive, performant network visualization showing every NBA teamma
 - TDD for all Python and data transformation code
 
 ### Must NOT Have (Guardrails)
+
 - NO player career stats visualization (teammate relationships only)
 - NO team win-loss overlays
 - NO live data integration or external API calls
@@ -100,12 +112,14 @@ Create an interactive, performant network visualization showing every NBA teamma
 > **ZERO HUMAN INTERVENTION** — ALL verification is agent-executed. No exceptions.
 
 ### Test Decision
+
 - **Infrastructure exists**: NO — will be set up in T1
 - **Automated tests**: TDD (tests first)
 - **Framework**: Jest (Python: pytest, JavaScript: Jest)
 - **If TDD**: Each task follows RED (failing test) → GREEN (minimal impl) → REFACTOR
 
 ### QA Policy
+
 Every task MUST include agent-executed QA scenarios.
 
 - **Python scripts**: Bash (python + pytest) — Run tests, assert outputs
@@ -121,7 +135,8 @@ Evidence saved to `.sisyphus/evidence/task-{N}-{scenario-slug}.{ext}`.
 
 ### Parallel Execution Waves
 
-```
+```text
+
 Wave 1 (Start Immediately — infrastructure + data foundation):
 ├── T1: Test infrastructure + project scaffolding [quick]
 ├── T2: Database validation + data quality checks [quick]
@@ -234,7 +249,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Python test infrastructure works
     Tool: Bash
     Preconditions: Virtual environment created, dependencies installed
@@ -311,7 +326,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: All validation checks pass
     Tool: Bash
     Preconditions: DB file exists at db/nba_raw_data.db
@@ -355,6 +370,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
     5. Creates aggregated view `v_teammate_edges` (one edge per player-pair)
     6. Creates per-team view `v_teammate_edges_by_team` (one edge per player-pair-team)
   - SQL query (the core):
+
     ```sql
     WITH normalized AS (
         SELECT player_id, team_id, season_id, start_date,
@@ -378,6 +394,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
       AND CAST(JULIANDAY(MIN(a.end_date, b.end_date))
            - JULIANDAY(MAX(a.start_date, b.start_date)) AS INTEGER) >= 14
     ```
+
   - Test with fixture: create temp DB with 3 players on same team, verify correct pairs generated
 
   **Must NOT do**:
@@ -410,7 +427,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Self-join produces correct teammate pairs
     Tool: Bash
     Preconditions: Extract script has run
@@ -482,7 +499,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: JSON schema validates correct data
     Tool: Bash
     Preconditions: Schema files and fixture data exist
@@ -561,7 +578,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Graph construction produces valid graph
     Tool: Bash
     Preconditions: teammate_overlaps table exists, dim_player/dim_team populated
@@ -641,7 +658,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Centrality metrics are valid
     Tool: Bash
     Preconditions: Graph constructed
@@ -716,7 +733,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Layout produces valid coordinates
     Tool: Bash
     Preconditions: Graph constructed
@@ -789,7 +806,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: JSON export is valid and within size budget
     Tool: Bash
     Preconditions: Graph, metrics, and layout computed
@@ -865,7 +882,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Data loading and filtering work correctly
     Tool: Bash
     Preconditions: JSON data files in public/data/, tests written
@@ -937,7 +954,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Network graph renders with WebGL
     Tool: Playwright
     Preconditions: Dev server running, JSON data loaded
@@ -1018,7 +1035,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Search finds players by partial name
     Tool: Playwright
     Preconditions: Dev server running, graph loaded
@@ -1101,7 +1118,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Hover tooltip shows player info
     Tool: Playwright
     Preconditions: Dev server running, graph loaded
@@ -1189,7 +1206,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Era filter reduces graph to selected era
     Tool: Playwright
     Preconditions: Dev server running, graph loaded
@@ -1273,7 +1290,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Shortest path found for known pair
     Tool: Playwright
     Preconditions: Dev server running, graph loaded, paths pre-computed
@@ -1352,7 +1369,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Initial render completes within performance budget
     Tool: Playwright
     Preconditions: Dev server running, production build
@@ -1432,7 +1449,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Loading state displays during data fetch
     Tool: Playwright
     Preconditions: Dev server running, slow network emulation
@@ -1514,7 +1531,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Static build produces deployable output
     Tool: Bash
     Preconditions: All frontend code complete
@@ -1585,7 +1602,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 
   **QA Scenarios**:
 
-  ```
+  ```text
   Scenario: Complete user journey works end-to-end
     Tool: Playwright
     Preconditions: Full build complete, dev server running
@@ -1636,20 +1653,20 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 > **Never mark F1-F4 as checked before getting user's okay.** Rejection or user feedback -> fix -> re-run -> present again -> wait for okay.
 
 - [ ] F1. **Plan Compliance Audit** — `oracle`
-  Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
-  Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
+      Read the plan end-to-end. For each "Must Have": verify implementation exists (read file, curl endpoint, run command). For each "Must NOT Have": search codebase for forbidden patterns — reject with file:line if found. Check evidence files exist in .sisyphus/evidence/. Compare deliverables against plan.
+      Output: `Must Have [N/N] | Must NOT Have [N/N] | Tasks [N/N] | VERDICT: APPROVE/REJECT`
 
 - [ ] F2. **Code Quality Review** — `unspecified-high`
-  Run `tsc --noEmit` + linter + `pytest` + `jest`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
-  Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
+      Run `tsc --noEmit` + linter + `pytest` + `jest`. Review all changed files for: `as any`/`@ts-ignore`, empty catches, console.log in prod, commented-out code, unused imports. Check AI slop: excessive comments, over-abstraction, generic names (data/result/item/temp).
+      Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | Tests [N pass/N fail] | Files [N clean/N issues] | VERDICT`
 
 - [ ] F3. **Real Manual QA** — `unspecified-high` (+ `playwright` skill if UI)
-  Start from clean state. Execute EVERY QA scenario from EVERY task — follow exact steps, capture evidence. Test cross-task integration (features working together, not isolation). Test edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
-  Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
+      Start from clean state. Execute EVERY QA scenario from EVERY task — follow exact steps, capture evidence. Test cross-task integration (features working together, not isolation). Test edge cases: empty state, invalid input, rapid actions. Save to `.sisyphus/evidence/final-qa/`.
+      Output: `Scenarios [N/N pass] | Integration [N/N] | Edge Cases [N tested] | VERDICT`
 
 - [ ] F4. **Scope Fidelity Check** — `deep`
-  For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
-  Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
+      For each task: read "What to do", read actual diff (git log/diff). Verify 1:1 — everything in spec was built (no missing), nothing beyond spec was built (no creep). Check "Must NOT do" compliance. Detect cross-task contamination: Task N touching Task M's files. Flag unaccounted changes.
+      Output: `Tasks [N/N compliant] | Contamination [CLEAN/N issues] | Unaccounted [CLEAN/N files] | VERDICT`
 
 ---
 
@@ -1676,6 +1693,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 ## Success Criteria
 
 ### Verification Commands
+
 ```bash
 python scripts/build_graph.py          # Expected: "Graph built: N nodes, M edges"
 pytest tests/python/ -v                # Expected: all tests pass
@@ -1685,6 +1703,7 @@ npx playwright test tests/e2e/         # Expected: all E2E scenarios pass
 ```
 
 ### Final Checklist
+
 - [ ] All "Must Have" features present and working
 - [ ] All "Must NOT Have" exclusions verified absent
 - [ ] All Python tests pass (pytest)
