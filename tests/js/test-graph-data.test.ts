@@ -3,7 +3,7 @@
  * Tests data loading, filtering, and search functionality
  */
 
-import { GraphData, NodeData, EdgeData, TeamTenure } from '@/lib/graph-types';
+import type { GraphData, NodeData, EdgeData, TeamTenure } from '@/lib/graph-types';
 
 // Mock data for testing
 const mockNodes: NodeData[] = [
@@ -203,8 +203,8 @@ describe('graph-data module', () => {
       expect(node).toHaveProperty('label');
       expect(node).toHaveProperty('position');
       expect(node).toHaveProperty('era');
-      expect(typeof node.x).toBe('number');
-      expect(typeof node.y).toBe('number');
+      expect(typeof node!.x).toBe('number');
+      expect(typeof node!.y).toBe('number');
     });
 
     it('should load valid EdgeData objects', async () => {
@@ -311,7 +311,7 @@ describe('graph-data module', () => {
     it('should return matching nodes', () => {
       const result = graphDataModule.searchPlayers(mockGraphData, 'Jordan');
       expect(result).toHaveLength(1);
-      expect(result[0].label).toBe('Michael Jordan');
+      expect(result[0]!.label).toBe('Michael Jordan');
     });
 
     it('should be case-insensitive', () => {
@@ -390,7 +390,7 @@ describe('graph-data module', () => {
 
       const result = graphDataModule.filterByEra(graphWithIsolated, '2020s');
       expect(result.nodes).toHaveLength(1);
-      expect(result.nodes[0].id).toBe('player_999');
+      expect(result.nodes[0]!.id).toBe('player_999');
     });
   });
 });
