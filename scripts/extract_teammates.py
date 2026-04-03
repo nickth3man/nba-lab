@@ -2,7 +2,6 @@ import os
 import sqlite3
 import time
 
-
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "db", "nba_raw_data.db")
 
 

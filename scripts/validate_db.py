@@ -1,8 +1,7 @@
-import os
 import json
+import os
 import sqlite3
 from datetime import datetime
-
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "db", "nba_raw_data.db")
 REPORT_PATH = os.path.join(

@@ -1,10 +1,29 @@
 import os
 import sqlite3
-import networkx as nx
 from collections import defaultdict
+from typing import TypedDict
 
+import networkx as nx
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "db", "nba_raw_data.db")
+
+
+class TeamTenure(TypedDict):
+    team_id: str
+    team_name: str
+    team_abbreviation: str
+    seasons: list[str]
+    overlap_days: int
+
+
+class EdgeAggregate(TypedDict):
+    weight: int
+    total_days: int
+    teams: list[TeamTenure]
+
+
+def make_edge_aggregate() -> EdgeAggregate:
+    return {"weight": 0, "total_days": 0, "teams": []}
 
 
 def get_db_connection(db_path=None):
@@ -57,9 +76,7 @@ def build_graph(db_path=None):
 
     G = nx.Graph()
 
-    cursor.execute(
-        "SELECT player_id, full_name, position, is_active, hof, draft_year FROM dim_player"
-    )
+    cursor.execute("SELECT player_id, full_name, position, is_active, hof, draft_year FROM dim_player")
     players = cursor.fetchall()
 
     for player_id, full_name, position, is_active, hof, draft_year in players:
@@ -77,16 +94,13 @@ def build_graph(db_path=None):
             draft_year=draft_year,
         )
 
-    cursor.execute(
-        "SELECT team_id, abbreviation, full_name, color_primary FROM dim_team"
-    )
+    cursor.execute("SELECT team_id, abbreviation, full_name, color_primary FROM dim_team")
     teams = {
-        row[0]: {"abbreviation": row[1], "full_name": row[2], "color_primary": row[3]}
-        for row in cursor.fetchall()
+        row[0]: {"abbreviation": row[1], "full_name": row[2], "color_primary": row[3]} for row in cursor.fetchall()
     }
 
     cursor.execute("""
-        SELECT 
+        SELECT
             player_a_id,
             player_b_id,
             team_id,
@@ -97,22 +111,21 @@ def build_graph(db_path=None):
         GROUP BY player_a_id, player_b_id, team_id
     """)
 
-    edge_agg = defaultdict(lambda: {"weight": 0, "total_days": 0, "teams": []})
+    edge_agg: defaultdict[tuple[str, str], EdgeAggregate] = defaultdict(make_edge_aggregate)
 
     for row in cursor.fetchall():
-        player_a, player_b, team_id, seasons_together, total_overlap, season_ids_str = (
-            row
-        )
+        player_a, player_b, team_id, seasons_together, total_overlap, season_ids_str = row
         edge_key = (min(player_a, player_b), max(player_a, player_b))
 
-        edge_agg[edge_key]["weight"] += seasons_together
-        edge_agg[edge_key]["total_days"] += total_overlap
+        aggregate = edge_agg[edge_key]
+        aggregate["weight"] += seasons_together
+        aggregate["total_days"] += total_overlap
 
         team_info = teams.get(team_id, {"abbreviation": "UNK", "full_name": "Unknown"})
 
         season_ids = season_ids_str.split(",") if season_ids_str else []
 
-        edge_agg[edge_key]["teams"].append(
+        aggregate["teams"].append(
             {
                 "team_id": team_id,
                 "team_name": team_info["full_name"],

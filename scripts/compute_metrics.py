@@ -31,13 +31,7 @@ def compute_centrality(G):
     # Use sampling for large graphs (>5K nodes) for performance
     # Reduced k for speed - betweenness is approximate anyway
     num_nodes = G.number_of_nodes()
-    if num_nodes > 3000:
-        # Use k=100 for faster approximate betweenness on large graphs
-        # This provides good approximation while completing in < 5 minutes
-        betweenness_centrality = nx.betweenness_centrality(G, k=100)
-    else:
-        # Full computation for smaller graphs
-        betweenness_centrality = nx.betweenness_centrality(G)
+    betweenness_centrality = nx.betweenness_centrality(G, k=100) if num_nodes > 3000 else nx.betweenness_centrality(G)
 
     # Compute connected components
     # Components are sorted by size (largest first), assign component_id by size rank
@@ -64,8 +58,8 @@ def compute_centrality(G):
 
 if __name__ == "__main__":
     # Test with build_graph
-    import sys
     import os
+    import sys
 
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
     from build_graph import build_graph
@@ -79,9 +73,7 @@ if __name__ == "__main__":
     print(f"Computed metrics for {len(metrics)} players")
 
     # Show top 10 by degree centrality
-    sorted_by_degree = sorted(
-        metrics.items(), key=lambda x: x[1]["degree"], reverse=True
-    )[:10]
+    sorted_by_degree = sorted(metrics.items(), key=lambda x: x[1]["degree"], reverse=True)[:10]
 
     print("\nTop 10 by Degree Centrality:")
     for player_id, data in sorted_by_degree:

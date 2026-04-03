@@ -10,7 +10,6 @@ import json
 import sys
 from pathlib import Path
 
-import jsonschema
 from jsonschema import Draft7Validator
 
 
