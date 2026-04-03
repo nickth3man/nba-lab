@@ -86,15 +86,14 @@ describe('Deployment Configuration', () => {
       const netlifyConfigPath = join(process.cwd(), 'netlify.toml');
       const content = readFileSync(netlifyConfigPath, 'utf-8');
       
-      expect(content).toContain('build-command = "npm run build"');
+      expect(content).toContain('command = "npm run build"');
       expect(content).toContain('publish = "out"');
     });
 
     it('should configure SPA routing redirects', () => {
-      const netlifyConfigPath = join(process.cwnd(), 'netlify.toml');
+      const netlifyConfigPath = join(process.cwd(), 'netlify.toml');
       const content = readFileSync(netlifyConfigPath, 'utf-8');
       
-      // Should have redirect rule for single page app routing
       expect(content).toContain('[[redirects]]');
       expect(content).toContain('from = "/*"');
       expect(content).toContain('to = "/index.html"');
@@ -107,14 +106,13 @@ describe('Deployment Configuration', () => {
       expect(existsSync(nextConfigPath)).toBe(true);
       
       const content = readFileSync(nextConfigPath, 'utf-8');
-      expect(content).toContain("output: 'export'");
+      expect(content).toContain('output: "export"');
     });
 
     it('should not enable server-side rendering', () => {
       const nextConfigPath = join(process.cwd(), 'next.config.ts');
       const content = readFileSync(nextConfigPath, 'utf-8');
       
-      // Static export is incompatible with server-side features
       expect(content).not.toContain('experimental.serverActions');
       expect(content).not.toContain('experimental.serverComponents');
     });

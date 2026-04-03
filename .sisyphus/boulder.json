@@ -40,7 +40,8 @@
     "ses_2ae2f77d8ffeLJN0uzKOmIi4fI",
     "ses_2ae24dc2dffetz002VLq1UZRVv",
     "ses_2ae1a1667ffebetTQYytsQlddC",
-    "ses_2adbe028affegHqZy7dBZfJYM9"
+    "ses_2adbe028affegHqZy7dBZfJYM9",
+    "ses_2adbb27f0ffeAq3wOTAaK0Kpl0"
   ],
   "plan_name": "nba-teammate-network",
   "agent": "atlas",
@@ -174,6 +175,15 @@
       "agent": "Sisyphus-Junior",
       "category": "quick",
       "updated_at": "2026-04-03T06:00:27.302Z"
+    },
+    "todo:17": {
+      "task_key": "todo:17",
+      "task_label": "17",
+      "task_title": "Deployment Config (Vercel/Netlify)",
+      "session_id": "ses_2adbb27f0ffeAq3wOTAaK0Kpl0",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-04-03T07:39:13.744Z"
     }
   }
 }
