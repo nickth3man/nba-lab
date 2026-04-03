@@ -4,11 +4,6 @@
 /node_modules
 /.pnp
 .pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
 
 # testing
 /coverage
@@ -38,9 +33,12 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+
+# Python
 .venv/
-/.sisyphus
-.venv
-/venv
-/.venv
+venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+.pytest_cache/
+
