@@ -44,3 +44,13 @@ __pycache__/
 .pytest_cache/
 
 /test-results
+/playwright-report/
+
+# generated data outputs
+/data/
+
+# local agent/tool state
+/.sisyphus/
+
+# user-local editor config
+/.vscode/settings.json
