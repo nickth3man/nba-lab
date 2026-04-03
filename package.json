@@ -9,12 +9,18 @@
     "lint": "eslint",
     "lint:py": "uv run ruff check scripts/ tests/python/",
     "lint:all": "npm run lint:py && npm run lint",
-    "test": "jest --maxWorkers=50%",
-    "test:py": "uv run pytest --numprocesses=auto --dist=loadscope",
-    "test:all": "concurrently \"npm run test:py\" \"npm run test\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:py": "uv run ruff format scripts/ tests/python/ && uv run ruff check --fix scripts/ tests/python/",
+    "format:py:check": "uv run ruff format --check scripts/ tests/python/",
+    "format:all": "npm run format && npm run format:py",
+    "test": "jest --maxWorkers=50%",
+    "test:js": "jest --runInBand",
+    "test:py": "uv run pytest",
+    "test:all": "concurrently \"npm run test:py\" \"npm run test\"",
     "typecheck": "tsc --noEmit",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@react-sigma/core": "^5.0.6",
@@ -36,8 +42,11 @@
     "concurrently": "^9.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.5",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
+    "prettier": "3.8.1",
     "ts-jest": "^29.4.9",
     "typescript": "^5"
   }

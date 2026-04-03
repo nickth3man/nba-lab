@@ -14,10 +14,7 @@ Edge size: derived from weight (normalize weight to 0.1-5 range)
 
 import json
 import os
-import sys
 from pathlib import Path
-
-import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = PROJECT_ROOT / "data"
@@ -90,7 +87,7 @@ class TestNodeExport:
             nodes = json.load(f)
 
         for node in nodes:
-            assert isinstance(node["label"], str), f"Node label should be string"
+            assert isinstance(node["label"], str), "Node label should be string"
 
     def test_node_coordinates_are_numeric(self):
         """Node x, y should be numeric."""
@@ -110,9 +107,9 @@ class TestNodeExport:
 
         for node in nodes:
             color = node["color"]
-            assert isinstance(color, str), f"Node color should be string"
-            assert color.startswith("#"), f"Node color should start with #"
-            assert len(color) == 7, f"Node color should be 7 chars (e.g., #RRGGBB)"
+            assert isinstance(color, str), "Node color should be string"
+            assert color.startswith("#"), "Node color should start with #"
+            assert len(color) == 7, "Node color should be 7 chars (e.g., #RRGGBB)"
 
     def test_node_boolean_fields(self):
         """Node is_active and hof should be booleans."""
@@ -121,8 +118,8 @@ class TestNodeExport:
             nodes = json.load(f)
 
         for node in nodes:
-            assert isinstance(node["is_active"], bool), f"Node is_active should be boolean"
-            assert isinstance(node["hof"], bool), f"Node hof should be boolean"
+            assert isinstance(node["is_active"], bool), "Node is_active should be boolean"
+            assert isinstance(node["hof"], bool), "Node hof should be boolean"
 
     def test_node_centrality_values_in_range(self):
         """Node degree, betweenness should be in valid range."""
@@ -131,8 +128,8 @@ class TestNodeExport:
             nodes = json.load(f)
 
         for node in nodes:
-            assert 0 <= node["degree"], f"Node degree should be >= 0"
-            assert 0 <= node["betweenness"] <= 1, f"Node betweenness should be between 0 and 1"
+            assert node["degree"] >= 0, "Node degree should be >= 0"
+            assert 0 <= node["betweenness"] <= 1, "Node betweenness should be between 0 and 1"
 
 
 class TestEdgeExport:
@@ -271,7 +268,7 @@ class TestSchemaValidation:
         validator = Draft7Validator(schema)
         errors = [str(e.message) for e in validator.iter_errors(nodes)]
 
-        assert len(errors) == 0, f"Nodes schema validation failed:\n" + "\n".join(errors)
+        assert len(errors) == 0, "Nodes schema validation failed:\n" + "\n".join(errors)
 
     def test_edges_pass_schema_validation(self):
         """edges.json should pass schema validation."""
@@ -289,7 +286,7 @@ class TestSchemaValidation:
         validator = Draft7Validator(schema)
         errors = [str(e.message) for e in validator.iter_errors(edges)]
 
-        assert len(errors) == 0, f"Edges schema validation failed:\n" + "\n".join(errors)
+        assert len(errors) == 0, "Edges schema validation failed:\n" + "\n".join(errors)
 
 
 class TestFileSizeBudget:

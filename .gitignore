@@ -39,7 +39,18 @@ yarn-error.log*
 venv/
 __pycache__/
 *.pyc
+*.egg-info/
 .ruff_cache/
 .pytest_cache/
 
 /test-results
+/playwright-report/
+
+# generated data outputs
+/data/
+
+# local agent/tool state
+/.sisyphus/
+
+# user-local editor config
+/.vscode/settings.json

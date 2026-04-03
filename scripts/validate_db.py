@@ -4,9 +4,7 @@ import sqlite3
 from datetime import datetime
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "db", "nba_raw_data.db")
-REPORT_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "data", "validation_report.json"
-)
+REPORT_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "validation_report.json")
 EVIDENCE_PATH = os.path.join(
     os.path.dirname(__file__),
     "..",

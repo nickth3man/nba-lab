@@ -34,7 +34,6 @@ def compute_paths(G, top_n=100, max_path_length=10):
     sorted_players = sorted(metrics.items(), key=lambda x: x[1]["degree"], reverse=True)
     top_players = [player_id for player_id, _ in sorted_players[:top_n]]
 
-    all_nodes = set(G.nodes())
     paths_data = {}
 
     print(f"Computing paths from {len(top_players)} source players...")
@@ -83,7 +82,6 @@ def main():
 
     print(f"Done! Wrote {len(paths_data)} source players with paths.")
 
-    source_count = len(paths_data)
     total_paths = sum(len(targets) for targets in paths_data.values())
     print(f"Total path entries: {total_paths}")
 

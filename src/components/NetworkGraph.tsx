@@ -1,16 +1,27 @@
-'use client';
+"use client";
 
-import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
-import { SigmaContainer, useLoadGraph, useRegisterEvents, useSigma, useSetSettings } from '@react-sigma/core';
-import Graph from 'graphology';
-import { loadGraphData } from '@/lib/graph-data';
-import { isMobileDevice, filterModernPlayers, debounce, createViewportCuller, createLODManager, type SigmaInstance } from '@/lib/performance';
-import type { GraphData, NodeData, EdgeData } from '@/lib/graph-types';
+import React, { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import {
+  SigmaContainer,
+  useLoadGraph,
+  useRegisterEvents,
+  useSigma,
+  useSetSettings,
+} from "@react-sigma/core";
+import Graph from "graphology";
+import { loadGraphData } from "@/lib/graph-data";
+import {
+  isMobileDevice,
+  filterModernPlayers,
+  debounce,
+  createViewportCuller,
+  createLODManager,
+  type SigmaInstance,
+} from "@/lib/performance";
+import type { GraphData, NodeData, EdgeData } from "@/lib/graph-types";
 
 const ZOOM_MIN = 0.1;
 const ZOOM_MAX = 10;
-const LOD_ZOOM_THRESHOLD = 0.5;
-
 interface NetworkGraphProps {
   onNodeHover?: (nodeId: string | null, nodeData?: NodeData | null) => void;
   onNodeClick?: (nodeId: string | null, nodeData?: NodeData | null) => void;
@@ -25,18 +36,21 @@ function getEdgeLookupKey(source: string, target: string): string {
 
 function useDebouncedHandler<T extends (...args: unknown[]) => void>(
   handler: T,
-  delay: number
+  delay: number,
 ): T {
-  const handlerRef = useRef(handler);
-  handlerRef.current = handler;
+  const handlerRef = useRef<T | null>(null);
 
-  const debouncedRef = useRef(
-    debounce((...args: unknown[]) => {
-      handlerRef.current(...args);
-    }, delay)
+  useEffect(() => {
+    handlerRef.current = handler;
+  });
+
+  return useMemo(
+    () =>
+      (debounce((...args: unknown[]) => {
+        handlerRef.current?.(...(args as Parameters<T>));
+      }, delay) as unknown as T),
+    [delay],
   );
-
-  return debouncedRef.current as T;
 }
 
 function useViewportCulling(sigma: SigmaInstance | null) {
@@ -59,7 +73,10 @@ function useViewportCulling(sigma: SigmaInstance | null) {
   return { getVisibleNodes, getVisibleEdges };
 }
 
-function useLODManagement(sigma: SigmaInstance | null, lodRef: React.MutableRefObject<ReturnType<typeof createLODManager> | null>) {
+function useLODManagement(
+  sigma: SigmaInstance | null,
+  lodRef: React.MutableRefObject<ReturnType<typeof createLODManager> | null>,
+) {
   useEffect(() => {
     if (sigma) {
       lodRef.current = createLODManager(sigma);
@@ -71,14 +88,14 @@ function useLODManagement(sigma: SigmaInstance | null, lodRef: React.MutableRefO
       lodRef.current.update();
       return lodRef.current.getLevel();
     }
-    return 'HIGH' as const;
+    return "HIGH" as const;
   }, [lodRef]);
 
   const getLODLevel = useCallback(() => {
     if (lodRef.current) {
       return lodRef.current.getLevel();
     }
-    return 'HIGH' as const;
+    return "HIGH" as const;
   }, [lodRef]);
 
   return { updateLOD, getLODLevel };
@@ -99,12 +116,10 @@ function GraphLoader({
   const registerEvents = useRegisterEvents();
   const sigma = useSigma();
   const setSettings = useSetSettings();
-  const [currentHighlighted, setCurrentHighlighted] = useState<string | null>(null);
-
   const nodeLookup = useMemo(() => {
     const lookup = new Map<string, NodeData>();
 
-    data?.nodes.forEach(node => {
+    data?.nodes.forEach((node) => {
       lookup.set(node.id, node);
     });
 
@@ -114,7 +129,7 @@ function GraphLoader({
   const edgeLookup = useMemo(() => {
     const lookup = new Map<string, EdgeData>();
 
-    data?.edges.forEach(edge => {
+    data?.edges.forEach((edge) => {
       lookup.set(getEdgeLookupKey(edge.source, edge.target), edge);
     });
 
@@ -124,7 +139,7 @@ function GraphLoader({
   const connectedEdgeLookup = useMemo(() => {
     const lookup = new Map<string, EdgeData[]>();
 
-    data?.edges.forEach(edge => {
+    data?.edges.forEach((edge) => {
       const sourceEdges = lookup.get(edge.source);
       const targetEdges = lookup.get(edge.target);
 
@@ -144,31 +159,39 @@ function GraphLoader({
     return lookup;
   }, [data]);
 
-  const getNodeData = useCallback((nodeId: string) => {
-    return nodeLookup.get(nodeId) || null;
-  }, [nodeLookup]);
-  
+  const getNodeData = useCallback(
+    (nodeId: string) => {
+      return nodeLookup.get(nodeId) || null;
+    },
+    [nodeLookup],
+  );
+
   const lodRef = useRef<ReturnType<typeof createLODManager> | null>(null);
-  const { updateLOD, getLODLevel } = useLODManagement(sigma as unknown as SigmaInstance | null, lodRef);
-  const { getVisibleNodes, getVisibleEdges } = useViewportCulling(sigma as unknown as SigmaInstance | null);
-  
+  const { updateLOD, getLODLevel } = useLODManagement(
+    sigma as unknown as SigmaInstance | null,
+    lodRef,
+  );
+  const { getVisibleNodes, getVisibleEdges } = useViewportCulling(
+    sigma as unknown as SigmaInstance | null,
+  );
+
   const debouncedHandleZoom = useDebouncedHandler(
     useCallback(() => {
       if (!sigma || !lodRef.current) return;
-      
+
       const level = updateLOD();
       const sizeMultiplier = lodRef.current.getNodeSizeMultiplier();
       const showLabels = lodRef.current.shouldShowLabels();
-      
+
       const graph = sigma.getGraph();
-      graph.nodes().forEach(nodeId => {
+      graph.nodes().forEach((nodeId) => {
         const originalSize = getNodeData(nodeId)?.size || 5;
-        graph.setNodeAttribute(nodeId, 'size', originalSize * sizeMultiplier);
+        graph.setNodeAttribute(nodeId, "size", originalSize * sizeMultiplier);
       });
-      
+
       setSettings({ renderLabels: showLabels });
     }, [sigma, getNodeData, updateLOD, setSettings]),
-    100
+    100,
   );
 
   useEffect(() => {
@@ -225,66 +248,66 @@ function GraphLoader({
   }, [data, loadGraph, registerEvents, onNodeHover, onNodeClick, debouncedHandleZoom, getNodeData]);
 
   useEffect(() => {
-    if (highlightedNode !== currentHighlighted) {
-      setCurrentHighlighted(highlightedNode || null);
-      
-      if (!sigma) return;
-      
-      const graph = sigma.getGraph();
+    if (!sigma) return;
 
-      graph.nodes().forEach(nodeId => {
-        const originalNode = nodeLookup.get(nodeId);
-        graph.setNodeAttribute(nodeId, 'color', originalNode?.color || '#808080');
-        graph.setNodeAttribute(nodeId, 'size', originalNode?.size || 5);
-      });
+    const graph = sigma.getGraph();
 
-      graph.forEachEdge((edgeId, _attributes, source, target) => {
-        const originalEdge = edgeLookup.get(getEdgeLookupKey(source, target));
+    graph.nodes().forEach((nodeId) => {
+      const originalNode = nodeLookup.get(nodeId);
+      graph.setNodeAttribute(nodeId, "color", originalNode?.color || "#808080");
+      graph.setNodeAttribute(nodeId, "size", originalNode?.size || 5);
+    });
 
-        graph.setEdgeAttribute(edgeId, 'color', '#cccccc');
-        graph.setEdgeAttribute(edgeId, 'size', Math.max(0.1, Math.min(originalEdge?.size || 0.5, 2)));
-      });
-      
-      if (!highlightedNode) {
+    graph.forEachEdge((edgeId, _attributes, source, target) => {
+      const originalEdge = edgeLookup.get(getEdgeLookupKey(source, target));
+
+      graph.setEdgeAttribute(edgeId, "color", "#cccccc");
+      graph.setEdgeAttribute(
+        edgeId,
+        "size",
+        Math.max(0.1, Math.min(originalEdge?.size || 0.5, 2)),
+      );
+    });
+
+    if (!highlightedNode) {
+      return;
+    }
+
+    const connectedEdges = connectedEdgeLookup.get(highlightedNode) || [];
+    const connectedNodes = new Set<string>();
+    connectedNodes.add(highlightedNode);
+    connectedEdges.forEach((e) => {
+      connectedNodes.add(e.source);
+      connectedNodes.add(e.target);
+    });
+
+    graph.nodes().forEach((nodeId) => {
+      const originalNode = nodeLookup.get(nodeId);
+
+      if (connectedNodes.has(nodeId)) {
+        graph.setNodeAttribute(nodeId, "color", originalNode?.color || "#808080");
+        graph.setNodeAttribute(nodeId, "size", (originalNode?.size || 5) * 1.5);
+      } else {
+        graph.setNodeAttribute(nodeId, "color", "#cccccc");
+        graph.setNodeAttribute(nodeId, "size", (originalNode?.size || 5) * 0.5);
+      }
+    });
+
+    connectedEdges.forEach((edge) => {
+      const edgeKey = graph.hasEdge(edge.source, edge.target)
+        ? [edge.source, edge.target]
+        : graph.hasEdge(edge.target, edge.source)
+          ? [edge.target, edge.source]
+          : null;
+
+      if (!edgeKey) {
         return;
       }
 
-      const connectedEdges = connectedEdgeLookup.get(highlightedNode) || [];
-      const connectedNodes = new Set<string>();
-      connectedNodes.add(highlightedNode);
-      connectedEdges.forEach(e => {
-        connectedNodes.add(e.source);
-        connectedNodes.add(e.target);
-      });
-
-      graph.nodes().forEach(nodeId => {
-        const originalNode = nodeLookup.get(nodeId);
-
-        if (connectedNodes.has(nodeId)) {
-          graph.setNodeAttribute(nodeId, 'color', originalNode?.color || '#808080');
-          graph.setNodeAttribute(nodeId, 'size', (originalNode?.size || 5) * 1.5);
-        } else {
-          graph.setNodeAttribute(nodeId, 'color', '#cccccc');
-          graph.setNodeAttribute(nodeId, 'size', (originalNode?.size || 5) * 0.5);
-        }
-      });
-
-      connectedEdges.forEach(edge => {
-        const edgeKey = graph.hasEdge(edge.source, edge.target)
-          ? [edge.source, edge.target]
-          : graph.hasEdge(edge.target, edge.source)
-            ? [edge.target, edge.source]
-            : null;
-
-        if (!edgeKey) {
-          return;
-        }
-
-        graph.setEdgeAttribute(edgeKey[0], edgeKey[1], 'color', '#ff6600');
-        graph.setEdgeAttribute(edgeKey[0], edgeKey[1], 'size', (edge.size || 1) * 2);
-      });
-    }
-  }, [highlightedNode, sigma, currentHighlighted, nodeLookup, edgeLookup, connectedEdgeLookup]);
+      graph.setEdgeAttribute(edgeKey[0], edgeKey[1], "color", "#ff6600");
+      graph.setEdgeAttribute(edgeKey[0], edgeKey[1], "size", (edge.size || 1) * 2);
+    });
+  }, [highlightedNode, sigma, nodeLookup, edgeLookup, connectedEdgeLookup]);
 
   return null;
 }
@@ -330,7 +353,7 @@ export default function NetworkGraph({
         }
       } catch (err) {
         if (mounted) {
-          setError(err instanceof Error ? err.message : 'Failed to load graph data');
+          setError(err instanceof Error ? err.message : "Failed to load graph data");
         }
       } finally {
         if (mounted) {
@@ -357,9 +380,7 @@ export default function NetworkGraph({
   if (error || !graphData) {
     return (
       <div style={containerStyle}>
-        <div style={errorStyle}>
-          {error || 'No data available'}
-        </div>
+        <div style={errorStyle}>{error || "No data available"}</div>
       </div>
     );
   }
@@ -375,7 +396,7 @@ export default function NetworkGraph({
   return (
     <div style={containerStyle} data-testid="network-graph">
       <SigmaContainer
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: "100%", height: "100%" }}
         settings={{
           allowInvalidContainer: true,
           minCameraRatio: ZOOM_MIN,
@@ -383,12 +404,12 @@ export default function NetworkGraph({
           renderLabels: false,
           renderEdgeLabels: false,
           hideEdgesOnMove: false,
-          labelFont: 'Arial',
+          labelFont: "Arial",
           labelSize: 12,
-          labelWeight: 'bold',
-          labelColor: { color: '#000000' },
-          defaultNodeColor: '#808080',
-          defaultEdgeColor: '#cccccc',
+          labelWeight: "bold",
+          labelColor: { color: "#000000" },
+          defaultNodeColor: "#808080",
+          defaultEdgeColor: "#cccccc",
           enableCameraZooming: true,
           enableCameraPanning: true,
         }}
@@ -405,23 +426,23 @@ export default function NetworkGraph({
 }
 
 const containerStyle: React.CSSProperties = {
-  width: '100%',
-  height: '100%',
-  position: 'relative',
-  backgroundColor: '#f5f5f5',
+  width: "100%",
+  height: "100%",
+  position: "relative",
+  backgroundColor: "#f5f5f5",
 };
 
 const loadingStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '100%',
-  height: '100%',
-  color: '#666',
-  fontSize: '16px',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "100%",
+  height: "100%",
+  color: "#666",
+  fontSize: "16px",
 };
 
 const errorStyle: React.CSSProperties = {
   ...loadingStyle,
-  color: '#e74c3c',
+  color: "#e74c3c",
 };

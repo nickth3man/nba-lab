@@ -3,8 +3,8 @@ Layout Computation for NBA Teammate Graph
 
 Computes:
 - Louvain community detection
-- igraph ForceAtlas2-like layout (Fruchterman-Reingold)
-- Node x, y coordinates
+- Circular layout via NetworkX (nx.circular_layout)
+- Node x, y coordinates (normalized to ±1000)
 - Node sizes based on degree centrality (scale: 3-15)
 - Node colors based on dominant team color in each community
 
@@ -73,7 +73,7 @@ def assign_community_colors_from_teams(G, partition):
     # Assign colors based on dominant team
     community_colors = {}
     for comm_id in set(partition.values()):
-        if comm_id in comm_team_weights and comm_team_weights[comm_id]:
+        if comm_team_weights.get(comm_id):
             # Find team with highest weight
             dominant_team = max(comm_team_weights[comm_id].keys(), key=lambda t: comm_team_weights[comm_id][t])
             color = team_colors.get(dominant_team)
@@ -204,7 +204,7 @@ def compute_layout(G):
         # Map old community IDs to new ones in range [0, 49]
         # Strategy: keep top 50 communities by size, remap the rest
         comm_sizes = {}
-        for node, comm in partition.items():
+        for _node, comm in partition.items():
             comm_sizes[comm] = comm_sizes.get(comm, 0) + 1
 
         # Sort communities by size descending

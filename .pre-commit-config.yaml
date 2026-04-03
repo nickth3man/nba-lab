@@ -12,16 +12,25 @@ repos:
       - id: check-toml
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.10
+    rev: v0.15.9
     hooks:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
 
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v9.39.2
+  - repo: local
     hooks:
       - id: eslint
-        types: [file]
+        name: eslint
+        entry: npm exec eslint -- --fix
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
         files: \.[jt]sx?$
-        args: [--fix]
+        pass_filenames: true
+
+      - id: prettier
+        name: prettier
+        entry: npm exec prettier -- --write --ignore-unknown
+        language: system
+        types_or: [javascript, jsx, ts, tsx, json, css, markdown]
+        pass_filenames: true

@@ -38,9 +38,7 @@ def validate_edges(json_path: Path, schema_path: Path) -> tuple[bool, list[str]]
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Validate NBA graph JSON files against schemas"
-    )
+    parser = argparse.ArgumentParser(description="Validate NBA graph JSON files against schemas")
     parser.add_argument("--nodes", type=str, help="Path to nodes JSON file")
     parser.add_argument("--edges", type=str, help="Path to edges JSON file")
     parser.add_argument(

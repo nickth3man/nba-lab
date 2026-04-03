@@ -1,4 +1,0 @@
-jsonschema>=4.26.0
-networkx>=3.6
-numpy>=2.4
-python-louvain>=0.16

@@ -1,34 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NBA Teammate Network
 
-## Getting Started
+Interactive visualization of NBA player teammate relationships (1946-2026) using network graph analysis. Built with Next.js 16, Sigma.js, Graphology, and Python data pipeline.
 
-First, run the development server:
+## Tech Stack
+
+| Layer           | Technologies                         |
+| --------------- | ------------------------------------ |
+| Frontend        | Next.js 16, React 19, TypeScript 5.x |
+| Graph rendering | Sigma.js 3.x, Graphology             |
+| Data pipeline   | Python 3.12+, NetworkX, NumPy, uv    |
+| Testing         | Jest, Pytest, Playwright             |
+| CI/CD           | GitHub Actions                       |
+
+## Quick Start
+
+**Prerequisites:** Node.js 20+, Python 3.12+, [uv](https://docs.astral.sh/uv/)
 
 ```bash
+# Install dependencies
+npm install
+uv sync
+
+# Start development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Build for production (static export)
+npm run build
+```
 
-## Learn More
+Output is written to `out/` for deployment to Vercel/Netlify.
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/app/          → Next.js pages (static export)
+src/components/   → React components (graph, filters, search, tooltips)
+src/lib/          → Graph data loading, types, performance utilities
+src/config/       → Team colors configuration
+scripts/          → Python data pipeline scripts
+tests/            → JS unit tests, Python tests, E2E tests
+schemas/          → JSON validation schemas (nodes, edges)
+data/             → Generated JSON data files
+db/               → SQLite source database
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Data Pipeline
 
-## Deploy on Vercel
+Scripts run in sequence to generate the graph data:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. `extract_teammates` — Parse raw data into teammate relationships
+2. `build_graph` — Construct graph structure from relationships
+3. `compute_metrics` — Calculate centrality and graph metrics
+4. `compute_layout` — Generate node positions and community colors
+5. `export_json` — Export to frontend-compatible format
+6. `validate_json_schema` — Validate against schemas
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+# Run individual scripts
+uv run python scripts/extract_teammates.py
+uv run python scripts/build_graph.py
+uv run python scripts/compute_metrics.py
+uv run python scripts/compute_layout.py
+uv run python scripts/export_json.py
+uv run python scripts/validate_json_schema.py
+```
+
+## Available Scripts
+
+| Command             | Description                   |
+| ------------------- | ----------------------------- |
+| `npm run dev`       | Start development server      |
+| `npm run build`     | Build static export           |
+| `npm run start`     | Start production server       |
+| `npm run lint`      | Lint TypeScript/JavaScript    |
+| `npm run lint:py`   | Lint Python with Ruff         |
+| `npm run format`    | Format code with Prettier     |
+| `npm run format:py` | Format Python with Ruff       |
+| `npm run test:js`   | Run Jest tests                |
+| `npm run test:py`   | Run Pytest tests              |
+| `npm run test:e2e`  | Run Playwright E2E tests      |
+| `npm run typecheck` | Run TypeScript compiler check |
+
+## Architecture Note
+
+Uses npm for the frontend app and uv for the Python data pipeline. Both have lockfiles (`package-lock.json`, `uv.lock`).
+
+## License
+
+MIT

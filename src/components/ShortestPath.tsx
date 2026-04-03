@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { searchPlayers } from '@/lib/graph-data';
-import type { EdgeData, GraphData, NodeData } from '@/lib/graph-types';
-import React, { useEffect, useRef, useState } from 'react';
+import { getBaseUrl, searchPlayers } from "@/lib/graph-data";
+import type { EdgeData, GraphData, NodeData } from "@/lib/graph-types";
+import React, { useEffect, useRef, useState } from "react";
 
 interface ShortestPathProps {
   data: GraphData;
@@ -18,21 +18,13 @@ interface PathsData {
 
 const DEBOUNCE_MS = 200;
 const MAX_RESULTS = 100;
-const PATHS_URL = '/data/paths.json';
-const PATH_COLOR = '#FF6B35';
-const NODE_COLOR_HIGHLIGHT = '#FF6B35';
-
-function getBaseUrl(): string {
-  if (typeof window !== 'undefined') {
-    return window.location.origin;
-  }
-  return 'http://localhost:3000';
-}
+const PATHS_URL = "/data/paths.json";
+const PATH_COLOR = "#FF6B35";
 
 function findTeamConnection(
   sourceId: string,
   targetId: string,
-  edges: EdgeData[]
+  edges: EdgeData[],
 ): { team: string; edge: EdgeData } | null {
   for (const edge of edges) {
     const isMatchingEdge =
@@ -47,13 +39,9 @@ function findTeamConnection(
   return null;
 }
 
-export default function ShortestPath({
-  data,
-  onPathChange,
-  onHighlightPath,
-}: ShortestPathProps) {
-  const [fromQuery, setFromQuery] = useState('');
-  const [toQuery, setToQuery] = useState('');
+export default function ShortestPath({ data, onPathChange, onHighlightPath }: ShortestPathProps) {
+  const [fromQuery, setFromQuery] = useState("");
+  const [toQuery, setToQuery] = useState("");
   const [fromResults, setFromResults] = useState<NodeData[]>([]);
   const [toResults, setToResults] = useState<NodeData[]>([]);
   const [fromOpen, setFromOpen] = useState(false);
@@ -62,8 +50,8 @@ export default function ShortestPath({
   const [toSelectedIndex, setToSelectedIndex] = useState(-1);
   const [fromPlayerId, setFromPlayerId] = useState<string | null>(null);
   const [toPlayerId, setToPlayerId] = useState<string | null>(null);
-  const [fromPlayerLabel, setFromPlayerLabel] = useState('');
-  const [toPlayerLabel, setToPlayerLabel] = useState('');
+  const [fromPlayerLabel, setFromPlayerLabel] = useState("");
+  const [toPlayerLabel, setToPlayerLabel] = useState("");
   const [currentPath, setCurrentPath] = useState<string[]>([]);
   const [pathError, setPathError] = useState<string | null>(null);
   const [pathsData, setPathsData] = useState<PathsData | null>(null);
@@ -89,7 +77,7 @@ export default function ShortestPath({
         setPathsData(data);
         setPathsError(null);
       } catch (err) {
-        setPathsError(err instanceof Error ? err.message : 'Failed to load paths');
+        setPathsError(err instanceof Error ? err.message : "Failed to load paths");
       } finally {
         setPathsLoading(false);
       }
@@ -156,8 +144,8 @@ export default function ShortestPath({
         setToOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -167,8 +155,8 @@ export default function ShortestPath({
       return;
     }
 
-    setFromQuery('');
-    setToQuery('');
+    setFromQuery("");
+    setToQuery("");
     setFromResults([]);
     setToResults([]);
     setFromOpen(false);
@@ -177,8 +165,8 @@ export default function ShortestPath({
     setToSelectedIndex(-1);
     setFromPlayerId(null);
     setToPlayerId(null);
-    setFromPlayerLabel('');
-    setToPlayerLabel('');
+    setFromPlayerLabel("");
+    setToPlayerLabel("");
     setCurrentPath([]);
     setPathError(null);
     onPathChange([]);
@@ -188,17 +176,17 @@ export default function ShortestPath({
   const handleFromInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!fromOpen || fromResults.length === 0) return;
 
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       e.preventDefault();
-      setFromSelectedIndex(prev => prev < fromResults.length - 1 ? prev + 1 : 0);
-    } else if (e.key === 'ArrowUp') {
+      setFromSelectedIndex((prev) => (prev < fromResults.length - 1 ? prev + 1 : 0));
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setFromSelectedIndex(prev => prev > 0 ? prev - 1 : fromResults.length - 1);
-    } else if (e.key === 'Enter' && fromSelectedIndex >= 0) {
+      setFromSelectedIndex((prev) => (prev > 0 ? prev - 1 : fromResults.length - 1));
+    } else if (e.key === "Enter" && fromSelectedIndex >= 0) {
       e.preventDefault();
       const player = fromResults[fromSelectedIndex];
       if (player) selectFromPlayer(player);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setFromOpen(false);
     }
   };
@@ -206,17 +194,17 @@ export default function ShortestPath({
   const handleToInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!toOpen || toResults.length === 0) return;
 
-    if (e.key === 'ArrowDown') {
+    if (e.key === "ArrowDown") {
       e.preventDefault();
-      setToSelectedIndex(prev => prev < toResults.length - 1 ? prev + 1 : 0);
-    } else if (e.key === 'ArrowUp') {
+      setToSelectedIndex((prev) => (prev < toResults.length - 1 ? prev + 1 : 0));
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setToSelectedIndex(prev => prev > 0 ? prev - 1 : toResults.length - 1);
-    } else if (e.key === 'Enter' && toSelectedIndex >= 0) {
+      setToSelectedIndex((prev) => (prev > 0 ? prev - 1 : toResults.length - 1));
+    } else if (e.key === "Enter" && toSelectedIndex >= 0) {
       e.preventDefault();
       const player = toResults[toSelectedIndex];
       if (player) selectToPlayer(player);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setToOpen(false);
     }
   };
@@ -224,7 +212,7 @@ export default function ShortestPath({
   const selectFromPlayer = (player: NodeData) => {
     setFromPlayerId(player.id);
     setFromPlayerLabel(player.label);
-    setFromQuery('');
+    setFromQuery("");
     setFromResults([]);
     setFromOpen(false);
     setFromSelectedIndex(-1);
@@ -234,7 +222,7 @@ export default function ShortestPath({
   const selectToPlayer = (player: NodeData) => {
     setToPlayerId(player.id);
     setToPlayerLabel(player.label);
-    setToQuery('');
+    setToQuery("");
     setToResults([]);
     setToOpen(false);
     setToSelectedIndex(-1);
@@ -243,22 +231,22 @@ export default function ShortestPath({
 
   const findPath = () => {
     if (!fromPlayerId || !toPlayerId) {
-      setPathError('Please select both players');
+      setPathError("Please select both players");
       return;
     }
 
     if (pathsLoading) {
-      setPathError('Paths data still loading');
+      setPathError("Paths data still loading");
       return;
     }
 
     if (pathsError) {
-      setPathError(`Error loading paths: ${pathsError ?? 'unknown'}`);
+      setPathError(`Error loading paths: ${pathsError ?? "unknown"}`);
       return;
     }
 
     if (!pathsData) {
-      setPathError('Paths data not available');
+      setPathError("Paths data not available");
       return;
     }
 
@@ -273,7 +261,7 @@ export default function ShortestPath({
 
     const path = sourcePaths[toPlayerId];
     if (!path) {
-      setPathError('No path found between these players');
+      setPathError("No path found between these players");
       setCurrentPath([]);
       onPathChange([]);
       onHighlightPath([]);
@@ -289,10 +277,10 @@ export default function ShortestPath({
   const clearPath = () => {
     setFromPlayerId(null);
     setToPlayerId(null);
-    setFromPlayerLabel('');
-    setToPlayerLabel('');
-    setFromQuery('');
-    setToQuery('');
+    setFromPlayerLabel("");
+    setToPlayerLabel("");
+    setFromQuery("");
+    setToQuery("");
     setCurrentPath([]);
     setPathError(null);
     onPathChange([]);
@@ -300,7 +288,7 @@ export default function ShortestPath({
   };
 
   const getNodeLabel = (nodeId: string): string => {
-    const node = data.nodes.find(n => n.id === nodeId);
+    const node = data.nodes.find((n) => n.id === nodeId);
     return node?.label || nodeId;
   };
 
@@ -325,11 +313,13 @@ export default function ShortestPath({
 
     return (
       <div style={pathContainerStyle}>
-        <p style={degreesStyle}>{degrees} degree{degrees !== 1 ? 's' : ''}</p>
+        <p style={degreesStyle}>
+          {degrees} degree{degrees !== 1 ? "s" : ""}
+        </p>
         <div style={pathListStyle}>
           {currentPath.map((nodeId, index) => {
             const label = getNodeLabel(nodeId);
-            const node = data.nodes.find(n => n.id === nodeId);
+            const node = data.nodes.find((n) => n.id === nodeId);
             const isHighlighted = true;
 
             let teamInfo: string | null = null;
@@ -348,19 +338,13 @@ export default function ShortestPath({
                 <span
                   style={{
                     ...pathNodeStyle,
-                    ...(isHighlighted ? { backgroundColor: PATH_COLOR, color: '#fff' } : {}),
+                    ...(isHighlighted ? { backgroundColor: PATH_COLOR, color: "#fff" } : {}),
                   }}
                 >
                   {label}
                 </span>
-                {teamInfo && (
-                  <span style={teamTagStyle}>
-                    {teamInfo}
-                  </span>
-                )}
-                {index < currentPath.length - 1 && (
-                  <span style={arrowStyle}>→</span>
-                )}
+                {teamInfo && <span style={teamTagStyle}>{teamInfo}</span>}
+                {index < currentPath.length - 1 && <span style={arrowStyle}>→</span>}
               </React.Fragment>
             );
           })}
@@ -378,7 +362,7 @@ export default function ShortestPath({
             data-testid="path-from-input"
             type="text"
             value={fromPlayerId ? fromPlayerLabel : fromQuery}
-            onChange={e => {
+            onChange={(e) => {
               if (!fromPlayerId) {
                 setFromQuery(e.target.value);
               }
@@ -402,8 +386,8 @@ export default function ShortestPath({
               type="button"
               onClick={() => {
                 setFromPlayerId(null);
-                setFromPlayerLabel('');
-                setFromQuery('');
+                setFromPlayerLabel("");
+                setFromQuery("");
                 fromInputRef.current?.focus();
               }}
               style={clearBtnStyle}
@@ -424,7 +408,7 @@ export default function ShortestPath({
                       key={player.id}
                       data-testid={`path-from-result-${index}`}
                       role="option"
-                      aria-selected={isSelected ? 'true' : 'false'}
+                      aria-selected={isSelected ? "true" : "false"}
                       tabIndex={0}
                       style={{
                         ...resultItemStyle,
@@ -432,7 +416,7 @@ export default function ShortestPath({
                       }}
                       onClick={() => selectFromPlayer(player)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
                           selectFromPlayer(player);
                         }
@@ -456,7 +440,7 @@ export default function ShortestPath({
             data-testid="path-to-input"
             type="text"
             value={toPlayerId ? toPlayerLabel : toQuery}
-            onChange={e => {
+            onChange={(e) => {
               if (!toPlayerId) {
                 setToQuery(e.target.value);
               }
@@ -480,8 +464,8 @@ export default function ShortestPath({
               type="button"
               onClick={() => {
                 setToPlayerId(null);
-                setToPlayerLabel('');
-                setToQuery('');
+                setToPlayerLabel("");
+                setToQuery("");
                 toInputRef.current?.focus();
               }}
               style={clearBtnStyle}
@@ -502,7 +486,7 @@ export default function ShortestPath({
                       key={player.id}
                       data-testid={`path-to-result-${index}`}
                       role="option"
-                      aria-selected={isSelected ? 'true' : 'false'}
+                      aria-selected={isSelected ? "true" : "false"}
                       tabIndex={0}
                       style={{
                         ...resultItemStyle,
@@ -510,7 +494,7 @@ export default function ShortestPath({
                       }}
                       onClick={() => selectToPlayer(player)}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
                           selectToPlayer(player);
                         }
@@ -537,8 +521,8 @@ export default function ShortestPath({
           data-testid="find-path-button"
           style={{
             ...buttonStyle,
-            ...(buttonPrimaryStyle),
-            ...((!fromPlayerId || !toPlayerId || pathsLoading) ? buttonDisabledStyle : {}),
+            ...buttonPrimaryStyle,
+            ...(!fromPlayerId || !toPlayerId || pathsLoading ? buttonDisabledStyle : {}),
           }}
         >
           Find Path
@@ -559,75 +543,75 @@ export default function ShortestPath({
 }
 
 const containerStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '12px',
-  padding: '16px',
-  backgroundColor: '#fff',
-  borderRadius: '8px',
-  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "12px",
+  padding: "16px",
+  backgroundColor: "#fff",
+  borderRadius: "8px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
 };
 
 const searchRowStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: '12px',
-  flexWrap: 'wrap',
+  display: "flex",
+  gap: "12px",
+  flexWrap: "wrap",
 };
 
 const searchContainerStyle: React.CSSProperties = {
-  position: 'relative',
-  flex: '1 1 200px',
-  minWidth: '180px',
+  position: "relative",
+  flex: "1 1 200px",
+  minWidth: "180px",
 };
 
 const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '10px 36px 10px 12px',
-  fontSize: '14px',
-  border: '1px solid #ccc',
-  borderRadius: '4px',
-  outline: 'none',
-  boxSizing: 'border-box',
+  width: "100%",
+  padding: "10px 36px 10px 12px",
+  fontSize: "14px",
+  border: "1px solid #ccc",
+  borderRadius: "4px",
+  outline: "none",
+  boxSizing: "border-box",
 };
 
 const inputDisabledStyle: React.CSSProperties = {
-  backgroundColor: '#f5f5f5',
-  cursor: 'default',
+  backgroundColor: "#f5f5f5",
+  cursor: "default",
 };
 
 const dropdownStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: '100%',
+  position: "absolute",
+  top: "100%",
   left: 0,
   right: 0,
-  maxHeight: '250px',
-  overflowY: 'auto',
-  backgroundColor: '#fff',
-  border: '1px solid #ccc',
-  borderTop: 'none',
-  borderRadius: '0 0 4px 4px',
-  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+  maxHeight: "250px",
+  overflowY: "auto",
+  backgroundColor: "#fff",
+  border: "1px solid #ccc",
+  borderTop: "none",
+  borderRadius: "0 0 4px 4px",
+  boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
   zIndex: 1000,
 };
 
 const noResultsStyle: React.CSSProperties = {
-  padding: '12px',
-  color: '#666',
-  fontStyle: 'italic',
-  textAlign: 'center',
+  padding: "12px",
+  color: "#666",
+  fontStyle: "italic",
+  textAlign: "center",
 };
 
 const resultItemStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  padding: '8px 12px',
-  cursor: 'pointer',
-  borderBottom: '1px solid #eee',
-  gap: '12px',
+  display: "flex",
+  alignItems: "center",
+  padding: "8px 12px",
+  cursor: "pointer",
+  borderBottom: "1px solid #eee",
+  gap: "12px",
 };
 
 const resultItemSelectedStyle: React.CSSProperties = {
-  backgroundColor: '#e6f0ff',
+  backgroundColor: "#e6f0ff",
 };
 
 const playerNameStyle: React.CSSProperties = {
@@ -636,101 +620,101 @@ const playerNameStyle: React.CSSProperties = {
 };
 
 const playerMetaStyle: React.CSSProperties = {
-  color: '#888',
-  fontSize: '12px',
+  color: "#888",
+  fontSize: "12px",
 };
 
 const clearBtnStyle: React.CSSProperties = {
-  position: 'absolute',
-  right: '8px',
-  top: '50%',
-  transform: 'translateY(-50%)',
-  background: 'none',
-  border: 'none',
-  fontSize: '18px',
-  color: '#888',
-  cursor: 'pointer',
-  padding: '4px 8px',
+  position: "absolute",
+  right: "8px",
+  top: "50%",
+  transform: "translateY(-50%)",
+  background: "none",
+  border: "none",
+  fontSize: "18px",
+  color: "#888",
+  cursor: "pointer",
+  padding: "4px 8px",
 };
 
 const buttonRowStyle: React.CSSProperties = {
-  display: 'flex',
-  gap: '12px',
+  display: "flex",
+  gap: "12px",
 };
 
 const buttonStyle: React.CSSProperties = {
-  padding: '10px 20px',
-  fontSize: '14px',
-  border: '1px solid #ccc',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  backgroundColor: '#fff',
+  padding: "10px 20px",
+  fontSize: "14px",
+  border: "1px solid #ccc",
+  borderRadius: "4px",
+  cursor: "pointer",
+  backgroundColor: "#fff",
 };
 
 const buttonPrimaryStyle: React.CSSProperties = {
-  backgroundColor: '#007bff',
-  color: '#fff',
-  borderColor: '#007bff',
+  backgroundColor: "#007bff",
+  color: "#fff",
+  borderColor: "#007bff",
 };
 
 const buttonDisabledStyle: React.CSSProperties = {
   opacity: 0.6,
-  cursor: 'not-allowed',
+  cursor: "not-allowed",
 };
 
 const hintStyle: React.CSSProperties = {
-  color: '#666',
-  fontSize: '14px',
-  textAlign: 'center',
-  margin: '8px 0',
+  color: "#666",
+  fontSize: "14px",
+  textAlign: "center",
+  margin: "8px 0",
 };
 
 const errorStyle: React.CSSProperties = {
-  color: '#dc3545',
-  fontSize: '14px',
-  textAlign: 'center',
-  margin: '8px 0',
+  color: "#dc3545",
+  fontSize: "14px",
+  textAlign: "center",
+  margin: "8px 0",
 };
 
 const pathContainerStyle: React.CSSProperties = {
-  marginTop: '8px',
-  padding: '12px',
-  backgroundColor: '#f8f9fa',
-  borderRadius: '4px',
+  marginTop: "8px",
+  padding: "12px",
+  backgroundColor: "#f8f9fa",
+  borderRadius: "4px",
 };
 
 const degreesStyle: React.CSSProperties = {
-  fontSize: '16px',
-  fontWeight: 'bold',
-  color: '#333',
-  marginBottom: '8px',
+  fontSize: "16px",
+  fontWeight: "bold",
+  color: "#333",
+  marginBottom: "8px",
 };
 
 const pathListStyle: React.CSSProperties = {
-  display: 'flex',
-  flexWrap: 'wrap',
-  alignItems: 'center',
-  gap: '4px',
+  display: "flex",
+  flexWrap: "wrap",
+  alignItems: "center",
+  gap: "4px",
 };
 
 const pathNodeStyle: React.CSSProperties = {
-  padding: '4px 10px',
-  borderRadius: '4px',
-  fontSize: '13px',
+  padding: "4px 10px",
+  borderRadius: "4px",
+  fontSize: "13px",
   fontWeight: 500,
-  backgroundColor: '#e9ecef',
+  backgroundColor: "#e9ecef",
 };
 
 const teamTagStyle: React.CSSProperties = {
-  padding: '2px 6px',
-  borderRadius: '3px',
-  fontSize: '11px',
-  backgroundColor: '#17a2b8',
-  color: '#fff',
+  padding: "2px 6px",
+  borderRadius: "3px",
+  fontSize: "11px",
+  backgroundColor: "#17a2b8",
+  color: "#fff",
 };
 
 const arrowStyle: React.CSSProperties = {
-  color: '#666',
-  fontSize: '16px',
-  padding: '0 2px',
+  color: "#666",
+  fontSize: "16px",
+  padding: "0 2px",
 };

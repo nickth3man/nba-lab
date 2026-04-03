@@ -5,7 +5,21 @@
   "type": "array",
   "items": {
     "type": "object",
-    "required": ["id", "label", "x", "y", "size", "color", "position", "era", "is_active", "hof", "degree", "betweenness", "community"],
+    "required": [
+      "id",
+      "label",
+      "x",
+      "y",
+      "size",
+      "color",
+      "position",
+      "era",
+      "is_active",
+      "hof",
+      "degree",
+      "betweenness",
+      "community"
+    ],
     "properties": {
       "id": {
         "type": "string",

@@ -6,9 +6,8 @@ Exports graph data to JSON files with schema validation.
 
 import gzip
 import json
-import os
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 DB_PATH = Path(__file__).parent.parent / "db" / "nba_raw_data.db"
@@ -42,7 +41,7 @@ def export_graph_data(G, metrics, layout):
 
     min_weight = float("inf")
     max_weight = float("-inf")
-    for u, v, data in G.edges(data=True):
+    for _u, _v, data in G.edges(data=True):
         weight = data.get("weight", 1)
         min_weight = min(min_weight, weight)
         max_weight = max(max_weight, weight)
@@ -115,7 +114,7 @@ def export_graph_data(G, metrics, layout):
     total_bytes = nodes_bytes + edges_bytes
 
     metadata = {
-        "exported_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "exported_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
         "node_count": len(nodes),
         "edge_count": len(edges),
         "file_sizes": {
