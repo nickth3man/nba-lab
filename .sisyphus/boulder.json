@@ -41,7 +41,11 @@
     "ses_2ae24dc2dffetz002VLq1UZRVv",
     "ses_2ae1a1667ffebetTQYytsQlddC",
     "ses_2adbe028affegHqZy7dBZfJYM9",
-    "ses_2adbb27f0ffeAq3wOTAaK0Kpl0"
+    "ses_2adbb27f0ffeAq3wOTAaK0Kpl0",
+    "ses_2adb5328fffeEgb2uwLcZnYK8E",
+    "ses_2adb4d593ffeMtFKsoLivp1Kv1",
+    "ses_2adb17ac7ffe812eOJFEU46z2N",
+    "ses_2adafe157ffe3bin7G94VxB4zb"
   ],
   "plan_name": "nba-teammate-network",
   "agent": "atlas",
@@ -184,6 +188,15 @@
       "agent": "Sisyphus-Junior",
       "category": "quick",
       "updated_at": "2026-04-03T07:39:13.744Z"
+    },
+    "todo:18": {
+      "task_key": "todo:18",
+      "task_label": "18",
+      "task_title": "Final Integration Test + End-to-End QA",
+      "session_id": "ses_2adafe157ffe3bin7G94VxB4zb",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-04-03T07:52:14.615Z"
     }
   }
 }

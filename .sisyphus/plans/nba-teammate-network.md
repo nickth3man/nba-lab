@@ -1467,7 +1467,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/ErrorBoundary.tsx`, `src/components/LoadingState.tsx`, `tests/js/test-error-handling.test.tsx`
   - Pre-commit: `npx jest tests/js/test-error-handling.test.tsx && npx tsc --noEmit`
 
-- [ ] 17. Deployment Config (Vercel/Netlify)
+- [x] 17. Deployment Config (Vercel/Netlify)
 
   **What to do**:
   - Write TDD test first: `tests/js/test-deployment-config.test.ts`
