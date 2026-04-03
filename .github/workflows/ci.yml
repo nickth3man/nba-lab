@@ -1,0 +1,174 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  js-deps:
+    name: JS deps
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.nm-cache.outputs.cache-primary-key }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - name: Cache node_modules
+        id: nm-cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
+      - name: Install JS dependencies
+        if: steps.nm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+  lint-py:
+    name: lint-py
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync
+      - run: npm run lint:py
+
+  format-check:
+    name: format-check
+    runs-on: ubuntu-latest
+    needs: [js-deps]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.js-deps.outputs.cache-key }}
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync
+      - run: npm run format:check
+      - run: npm run format:py:check
+
+  lint-js:
+    name: lint-js
+    runs-on: ubuntu-latest
+    needs: [js-deps]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.js-deps.outputs.cache-key }}
+      - run: npm run lint
+
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    needs: [js-deps]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.js-deps.outputs.cache-key }}
+      - run: npm run typecheck
+
+  test-py:
+    name: test-py
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          python-version: "3.12"
+      - run: uv sync
+      - run: npm run test:py
+
+  test-js:
+    name: test-js
+    runs-on: ubuntu-latest
+    needs: [js-deps]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.js-deps.outputs.cache-key }}
+      - run: npm run test:js
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    needs: [js-deps]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.js-deps.outputs.cache-key }}
+      - run: npm run build
+      - name: Verify static export
+        run: test -d out && echo "out/ exists" || (echo "out/ missing" && exit 1)
+
+  e2e:
+    name: e2e
+    runs-on: ubuntu-latest
+    needs: [js-deps, build]
+    if: ${{ vars.ENABLE_E2E == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.js-deps.outputs.cache-key }}
+      - run: npx playwright install --with-deps
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report
+          if-no-files-found: ignore
