@@ -1,0 +1,60 @@
+[
+  {
+    "id": "edge_001",
+    "source": "player_001",
+    "target": "player_002",
+    "weight": 7,
+    "teams": [
+      {
+        "team_id": "CHI",
+        "team_name": "Chicago Bulls",
+        "team_abbreviation": "CHI",
+        "seasons": ["1987-88", "1988-89", "1989-90", "1990-91", "1991-92", "1992-93", "1993-94", "1994-95", "1995-96", "1996-97", "1997-98"],
+        "overlap_days": 2555
+      }
+    ],
+    "total_days": 2555,
+    "size": 14
+  },
+  {
+    "id": "edge_002",
+    "source": "player_003",
+    "target": "player_005",
+    "weight": 4,
+    "teams": [
+      {
+        "team_id": "CLE",
+        "team_name": "Cleveland Cavaliers",
+        "team_abbreviation": "CLE",
+        "seasons": ["2014-15"],
+        "overlap_days": 365
+      },
+      {
+        "team_id": "USA",
+        "team_name": "USA Basketball",
+        "team_abbreviation": "USA",
+        "seasons": ["2012-13"],
+        "overlap_days": 30
+      }
+    ],
+    "total_days": 395,
+    "size": 8
+  },
+  {
+    "id": "edge_003",
+    "source": "player_004",
+    "target": "player_006",
+    "weight": 3,
+    "teams": [
+      {
+        "team_id": "LAL",
+        "team_name": "Los Angeles Lakers",
+        "team_abbreviation": "LAL",
+        "seasons": ["1996-97", "1997-98", "1998-99"],
+        "overlap_days": 1095
+      }
+    ],
+    "total_days": 1095,
+    "size": 6
+  }
+]

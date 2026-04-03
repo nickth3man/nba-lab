@@ -1,0 +1,15 @@
+=== TASK 5: KNOWN EDGE VERIFICATION ===
+
+LeBron (2544) + Wade (2548):
+  EXISTS: Yes
+  weight (seasons_together): 3
+  total_days: 15890
+  Team: MIA (Miami Heat), seasons=['2010-11', '2011-12', '2012-13'], days=15890
+
+Jordan (893) + Pippen (937):
+  EXISTS: Yes
+  weight (seasons_together): 10
+  total_days: 122729
+  Team: CHI (Chicago Bulls), seasons=['1987-88', '1988-89', '1989-90', '1990-91', '1991-92', '1992-93', '1994-95', '1995-96', '1996-97', '1997-98'], days=122729
+
+VERIFICATION: All known edges found successfully

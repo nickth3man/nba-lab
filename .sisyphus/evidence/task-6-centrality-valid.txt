@@ -1,0 +1,75 @@
+T6: Centrality Metrics Computation - Evidence
+============================================
+Date: 2026-04-02
+Task: Create compute_centrality(G) for NBA teammate overlap graph
+
+PYTEST RESULTS
+--------------
+tests/python/test_centrality_metrics.py
+12 passed in 73.58s (0:01:13)
+
+All tests passing:
+- test_degree_centrality_all_values_between_0_and_1: PASSED
+- test_degree_centrality_sum_reasonable: PASSED
+- test_betweenness_centrality_all_values_between_0_and_1: PASSED
+- test_betweenness_centrality_sum_positive: PASSED
+- test_all_nodes_have_component_id: PASSED
+- test_most_nodes_in_main_component: PASSED
+- test_component_ids_are_integers: PASSED
+- test_top_10_degree_centrality_players_exist: PASSED
+- test_top_degree_players_have_high_degree: PASSED
+- test_top_degree_centrality_values_decrease: PASSED
+- test_computation_completes_under_5_minutes: PASSED
+- test_returns_dict_with_all_nodes: PASSED
+
+VERIFICATION RESULTS
+--------------------
+Graph: 5115 nodes, 111483 edges
+
+Degree centrality range: 0.0 - 0.0393
+All degree values in [0,1]: True
+
+Betweenness centrality range: 0.0 - ~0.0144
+All betweenness values in [0,1]: True
+
+Largest component: ~90% of nodes
+Most players are in the giant connected component
+
+TOP 10 DEGREE CENTRALITY PLAYERS (by player_id)
+-----------------------------------------------
+1. 201145: degree=0.0393, betweenness=0.0051, component=0
+2. 1713: degree=0.0375, betweenness=0.0144, component=0
+3. 101108: degree=0.0368, betweenness=0.0125, component=0
+4. 2199: degree=0.0366, betweenness=0.0049, component=0
+5. 2544: degree=0.0360, betweenness=0.0062, component=0
+6. 202066: degree=0.0354, betweenness=0.0041, component=0
+7. 201569: degree=0.0352, betweenness=0.0035, component=0
+8. 200765: degree=0.0352, betweenness=0.0034, component=0
+9. 201599: degree=0.0350, betweenness=0.0140, component=0
+10. 201572: degree=0.0342, betweenness=0.0023, component=0
+
+These represent high-degree (journeyman/long-career) players:
+- Player IDs correspond to players with many unique teammates
+- High degree centrality indicates many seasons with different teammates
+- All top players are in the main connected component (component=0)
+
+PERFORMANCE
+-----------
+Computation completed in ~74 seconds, well under 5-minute (300s) limit.
+Betweenness sampling (k=1000) used due to graph size > 5000 nodes.
+
+IMPLEMENTATION
+--------------
+- scripts/compute_metrics.py with compute_centrality(G) function
+- Uses nx.degree_centrality(G) for degree centrality
+- Uses nx.betweenness_centrality(G, k=1000) for sampling on large graphs (>5K nodes)
+- Uses nx.connected_components(G) for component detection
+- Returns dict: {player_id: {degree, betweenness, component_id}}
+
+All requirements satisfied:
+[PASS] pytest tests/python/test_centrality_metrics.py -v → 12 passed
+[PASS] All degree centrality values between 0 and 1
+[PASS] All betweenness centrality values between 0 and 1
+[PASS] Top 10 degree centrality players are reasonable (journeymen/long careers)
+[PASS] Computation completed in <5 minutes
+[PASS] Evidence saved to task-6-centrality-valid.txt

@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NBA Teammate Network Nodes",
+  "description": "JSON Schema for NBA teammate network graph nodes",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["id", "label", "x", "y", "size", "color", "position", "era", "is_active", "hof", "degree", "betweenness", "community"],
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Unique player identifier"
+      },
+      "label": {
+        "type": "string",
+        "description": "Player display name"
+      },
+      "x": {
+        "type": "number",
+        "description": "X coordinate from ForceAtlas2 layout"
+      },
+      "y": {
+        "type": "number",
+        "description": "Y coordinate from ForceAtlas2 layout"
+      },
+      "size": {
+        "type": "number",
+        "minimum": 0,
+        "description": "Node visual size"
+      },
+      "color": {
+        "type": "string",
+        "pattern": "^#[0-9A-Fa-f]{6}$",
+        "description": "Hex color code"
+      },
+      "position": {
+        "type": "string",
+        "description": "Player position (e.g., 'PG', 'SG', 'SF', 'PF', 'C')"
+      },
+      "era": {
+        "type": "string",
+        "description": "Career era (e.g., '1980s', '1990s', '2000s', '2010s', '2020s')"
+      },
+      "is_active": {
+        "type": "boolean",
+        "description": "Whether player is currently active"
+      },
+      "hof": {
+        "type": "boolean",
+        "description": "Hall of Fame status"
+      },
+      "draft_year": {
+        "type": ["integer", "null"],
+        "description": "Year player was drafted"
+      },
+      "degree": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "Number of teammate connections"
+      },
+      "betweenness": {
+        "type": "number",
+        "minimum": 0,
+        "description": "Betweenness centrality score"
+      },
+      "community": {
+        "type": "integer",
+        "description": "Louvain community detection cluster ID"
+      }
+    },
+    "additionalProperties": false
+  }
+}

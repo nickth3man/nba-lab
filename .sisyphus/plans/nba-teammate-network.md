@@ -192,7 +192,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
 > Implementation + Test = ONE Task. Never separate.
 > EVERY task MUST have: Recommended Agent Profile + Parallelization info + QA Scenarios.
 
-- [ ] 1. Test Infrastructure + Project Scaffolding
+- [x] 1. Test Infrastructure + Project Scaffolding
 
   **What to do**:
   - Create project directory structure: `scripts/`, `data/`, `src/`, `tests/python/`, `tests/js/`
@@ -266,7 +266,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `pytest.ini`, `jest.config.js`, `package.json`, `tests/`, `scripts/`, `src/`
   - Pre-commit: `pytest tests/python/ -v && npx jest --passWithNoTests`
 
-- [ ] 2. Database Validation + Data Quality Checks
+- [x] 2. Database Validation + Data Quality Checks
 
   **What to do**:
   - Write Python script `scripts/validate_db.py` that runs data quality checks
@@ -343,7 +343,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `scripts/validate_db.py`, `tests/python/test_validate_db.py`, `data/validation_report.json`
   - Pre-commit: `pytest tests/python/test_validate_db.py -v`
 
-- [ ] 3. Teammate Overlap SQL + Materialized Table
+- [x] 3. Teammate Overlap SQL + Materialized Table
 
   **What to do**:
   - Write TDD test first: `tests/python/test_teammate_sql.py` with known fixture data
@@ -443,7 +443,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `scripts/extract_teammates.py`, `tests/python/test_teammate_sql.py`
   - Pre-commit: `pytest tests/python/test_teammate_sql.py -v`
 
-- [ ] 4. Graph Schema Definition + JSON Type Contracts
+- [x] 4. Graph Schema Definition + JSON Type Contracts
 
   **What to do**:
   - Write TDD test first: `tests/python/test_graph_schema.py` and `tests/js/test-graph-schema.test.ts`
@@ -513,7 +513,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/lib/graph-types.ts`, `schemas/nodes.schema.json`, `schemas/edges.schema.json`, `scripts/validate_json_schema.py`, `tests/`
   - Pre-commit: `pytest tests/python/test_graph_schema.py -v && npx jest tests/js/test-graph-schema.test.ts`
 
-- [ ] 5. Graph Construction (NetworkX Nodes + Edges)
+- [x] 5. Graph Construction (NetworkX Nodes + Edges)
 
   **What to do**:
   - Write TDD test first: `tests/python/test_graph_construction.py`
@@ -597,7 +597,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `scripts/build_graph.py`, `tests/python/test_graph_construction.py`
   - Pre-commit: `pytest tests/python/test_graph_construction.py -v`
 
-- [ ] 6. Centrality Metrics Computation
+- [x] 6. Centrality Metrics Computation
 
   **What to do**:
   - Write TDD test first: `tests/python/test_centrality_metrics.py`
@@ -669,7 +669,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `scripts/compute_metrics.py`, `tests/python/test_centrality_metrics.py`
   - Pre-commit: `pytest tests/python/test_centrality_metrics.py -v`
 
-- [ ] 7. Community Detection + ForceAtlas2 Layout
+- [x] 7. Community Detection + ForceAtlas2 Layout
 
   **What to do**:
   - Write TDD test first: `tests/python/test_layout.py`
@@ -745,7 +745,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `scripts/compute_layout.py`, `tests/python/test_layout.py`
   - Pre-commit: `pytest tests/python/test_layout.py -v`
 
-- [ ] 8. JSON Export + Schema Validation
+- [x] 8. JSON Export + Schema Validation
 
   **What to do**:
   - Write TDD test first: `tests/python/test_json_export.py`
@@ -819,7 +819,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `scripts/export_json.py`, `tests/python/test_json_export.py`
   - Pre-commit: `pytest tests/python/test_json_export.py -v`
 
-- [ ] 9. Next.js Project Setup + Data Loading Layer
+- [x] 9. Next.js Project Setup + Data Loading Layer
 
   **What to do**:
   - Write TDD test first: `tests/js/test-graph-data.test.ts`
@@ -886,7 +886,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/lib/graph-data.ts`, `src/config/team-colors.ts`, `tests/js/test-graph-data.test.ts`, `public/data/`
   - Pre-commit: `npx jest tests/js/test-graph-data.test.ts && npx tsc --noEmit`
 
-- [ ] 10. Sigma.js Visualization Core + WebGL Rendering
+- [x] 10. Sigma.js Visualization Core + WebGL Rendering
 
   **What to do**:
   - Write TDD test first: `tests/js/test-network-graph.test.tsx`
@@ -971,7 +971,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/NetworkGraph.tsx`, `src/app/page.tsx`, `tests/js/test-network-graph.test.tsx`
   - Pre-commit: `npx jest tests/js/test-network-graph.test.tsx && npx tsc --noEmit`
 
-- [ ] 11. Player Search + Autocomplete
+- [x] 11. Player Search + Autocomplete
 
   **What to do**:
   - Write TDD test first: `tests/js/test-search-bar.test.tsx`
@@ -1053,7 +1053,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/SearchBar.tsx`, `tests/js/test-search-bar.test.tsx`
   - Pre-commit: `npx jest tests/js/test-search-bar.test.tsx && npx tsc --noEmit`
 
-- [ ] 12. Hover Tooltips + Click Drill-Down
+- [x] 12. Hover Tooltips + Click Drill-Down
 
   **What to do**:
   - Write TDD test first: `tests/js/test-player-tooltip.test.tsx`
@@ -1141,7 +1141,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/PlayerTooltip.tsx`, `tests/js/test-player-tooltip.test.tsx`
   - Pre-commit: `npx jest tests/js/test-player-tooltip.test.tsx && npx tsc --noEmit`
 
-- [ ] 13. Era/Team/Position Filters
+- [x] 13. Era/Team/Position Filters
 
   **What to do**:
   - Write TDD test first: `tests/js/test-filters.test.tsx`
@@ -1227,7 +1227,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/Filters.tsx`, `tests/js/test-filters.test.tsx`
   - Pre-commit: `npx jest tests/js/test-filters.test.tsx && npx tsc --noEmit`
 
-- [ ] 14. Shortest Path Finder UI
+- [x] 14. Shortest Path Finder UI
 
   **What to do**:
   - Write TDD test first: `tests/js/test-shortest-path.test.tsx`
@@ -1310,7 +1310,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/ShortestPath.tsx`, `tests/js/test-shortest-path.test.tsx`
   - Pre-commit: `npx jest tests/js/test-shortest-path.test.tsx && npx tsc --noEmit`
 
-- [ ] 15. Performance Optimization + Mobile Detection
+- [x] 15. Performance Optimization + Mobile Detection
 
   **What to do**:
   - Write TDD test first: `tests/js/test-performance.test.ts`
@@ -1388,7 +1388,7 @@ Wave FINAL (After ALL tasks — 4 parallel reviews, then user okay):
   - Files: `src/components/NetworkGraph.tsx`, `src/lib/performance.ts`, `tests/js/test-performance.test.ts`
   - Pre-commit: `npx jest tests/js/test-performance.test.ts && npx tsc --noEmit`
 
-- [ ] 16. Error Handling + WebGL Fallback + Loading States
+- [x] 16. Error Handling + WebGL Fallback + Loading States
 
   **What to do**:
   - Write TDD test first: `tests/js/test-error-handling.test.tsx`
