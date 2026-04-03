@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import type { GraphData, NodeData, EdgeData } from '@/lib/graph-types';
 import { searchPlayers } from '@/lib/graph-data';
+import type { EdgeData, GraphData, NodeData } from '@/lib/graph-types';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface ShortestPathProps {
   data: GraphData;
@@ -35,16 +35,13 @@ function findTeamConnection(
   edges: EdgeData[]
 ): { team: string; edge: EdgeData } | null {
   for (const edge of edges) {
-    if (
+    const isMatchingEdge =
       (edge.source === sourceId && edge.target === targetId) ||
-      (edge.source === targetId && edge.target === sourceId)
-    ) {
-      if (edge.teams && edge.teams.length > 0) {
-        const firstTeam = edge.teams[0];
-        if (firstTeam) {
-          return { team: firstTeam.team_abbreviation, edge };
-        }
-      }
+      (edge.source === targetId && edge.target === sourceId);
+    const firstTeam = edge.teams?.[0];
+
+    if (isMatchingEdge && edge.teams && edge.teams.length > 0 && firstTeam) {
+      return { team: firstTeam.team_abbreviation, edge };
     }
   }
   return null;
@@ -162,6 +159,31 @@ export default function ShortestPath({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    const hasAvailableGraphData = data.nodes.length > 0 || data.edges.length > 0;
+
+    if (!hasAvailableGraphData) {
+      return;
+    }
+
+    setFromQuery('');
+    setToQuery('');
+    setFromResults([]);
+    setToResults([]);
+    setFromOpen(false);
+    setToOpen(false);
+    setFromSelectedIndex(-1);
+    setToSelectedIndex(-1);
+    setFromPlayerId(null);
+    setToPlayerId(null);
+    setFromPlayerLabel('');
+    setToPlayerLabel('');
+    setCurrentPath([]);
+    setPathError(null);
+    onPathChange([]);
+    onHighlightPath([]);
+  }, [data, onHighlightPath, onPathChange]);
 
   const handleFromInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!fromOpen || fromResults.length === 0) return;
@@ -353,6 +375,7 @@ export default function ShortestPath({
         <div ref={fromContainerRef} style={searchContainerStyle}>
           <input
             ref={fromInputRef}
+            data-testid="path-from-input"
             type="text"
             value={fromPlayerId ? fromPlayerLabel : fromQuery}
             onChange={e => {
@@ -390,7 +413,7 @@ export default function ShortestPath({
             </button>
           )}
           {fromOpen && !fromPlayerId && (
-            <div style={dropdownStyle}>
+            <div style={dropdownStyle} role="listbox" data-testid="path-from-results">
               {fromResults.length === 0 ? (
                 <div style={noResultsStyle}>No players found</div>
               ) : (
@@ -399,8 +422,9 @@ export default function ShortestPath({
                   return (
                     <div
                       key={player.id}
+                      data-testid={`path-from-result-${index}`}
                       role="option"
-                      aria-selected={isSelected}
+                      aria-selected={isSelected ? 'true' : 'false'}
                       tabIndex={0}
                       style={{
                         ...resultItemStyle,
@@ -429,6 +453,7 @@ export default function ShortestPath({
         <div ref={toContainerRef} style={searchContainerStyle}>
           <input
             ref={toInputRef}
+            data-testid="path-to-input"
             type="text"
             value={toPlayerId ? toPlayerLabel : toQuery}
             onChange={e => {
@@ -466,7 +491,7 @@ export default function ShortestPath({
             </button>
           )}
           {toOpen && !toPlayerId && (
-            <div style={dropdownStyle}>
+            <div style={dropdownStyle} role="listbox" data-testid="path-to-results">
               {toResults.length === 0 ? (
                 <div style={noResultsStyle}>No players found</div>
               ) : (
@@ -475,8 +500,9 @@ export default function ShortestPath({
                   return (
                     <div
                       key={player.id}
+                      data-testid={`path-to-result-${index}`}
                       role="option"
-                      aria-selected={isSelected}
+                      aria-selected={isSelected ? 'true' : 'false'}
                       tabIndex={0}
                       style={{
                         ...resultItemStyle,
@@ -508,6 +534,7 @@ export default function ShortestPath({
           type="button"
           onClick={findPath}
           disabled={!fromPlayerId || !toPlayerId || pathsLoading}
+          data-testid="find-path-button"
           style={{
             ...buttonStyle,
             ...(buttonPrimaryStyle),
@@ -519,13 +546,14 @@ export default function ShortestPath({
         <button
           type="button"
           onClick={clearPath}
+          data-testid="clear-path-button"
           style={buttonStyle}
         >
           Clear Path
         </button>
       </div>
 
-      {renderPathDisplay()}
+      <div data-testid="path-feedback">{renderPathDisplay()}</div>
     </div>
   );
 }
