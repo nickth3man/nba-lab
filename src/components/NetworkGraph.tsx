@@ -180,12 +180,23 @@ function GraphLoader({
       if (!sigma) return;
       
       const graph = sigma.getGraph();
+
+      graph.nodes().forEach(nodeId => {
+        graph.setNodeAttribute(nodeId, 'color', data?.nodes.find(n => n.id === nodeId)?.color || '#808080');
+        graph.setNodeAttribute(nodeId, 'size', data?.nodes.find(n => n.id === nodeId)?.size || 5);
+      });
+
+      graph.forEachEdge((edgeId, _attributes, source, target) => {
+        const originalEdge = data?.edges.find(edge => (
+          (edge.source === source && edge.target === target) ||
+          (edge.source === target && edge.target === source)
+        ));
+
+        graph.setEdgeAttribute(edgeId, 'color', '#cccccc');
+        graph.setEdgeAttribute(edgeId, 'size', Math.max(0.1, Math.min(originalEdge?.size || 0.5, 2)));
+      });
       
       if (!highlightedNode) {
-        graph.nodes().forEach(nodeId => {
-          graph.setNodeAttribute(nodeId, 'color', data?.nodes.find(n => n.id === nodeId)?.color || '#808080');
-          graph.setNodeAttribute(nodeId, 'size', data?.nodes.find(n => n.id === nodeId)?.size || 5);
-        });
         return;
       }
 
@@ -208,16 +219,18 @@ function GraphLoader({
       });
 
       connectedEdges.forEach(edge => {
-        try {
-          graph.setEdgeAttribute(edge.source, edge.target, 'color', '#ff6600');
-          graph.setEdgeAttribute(edge.source, edge.target, 'size', (edge.size || 1) * 2);
-        } catch {
-          try {
-            graph.setEdgeAttribute(edge.target, edge.source, 'color', '#ff6600');
-            graph.setEdgeAttribute(edge.target, edge.source, 'size', (edge.size || 1) * 2);
-          } catch {
-          }
+        const edgeKey = graph.hasEdge(edge.source, edge.target)
+          ? [edge.source, edge.target]
+          : graph.hasEdge(edge.target, edge.source)
+            ? [edge.target, edge.source]
+            : null;
+
+        if (!edgeKey) {
+          return;
         }
+
+        graph.setEdgeAttribute(edgeKey[0], edgeKey[1], 'color', '#ff6600');
+        graph.setEdgeAttribute(edgeKey[0], edgeKey[1], 'size', (edge.size || 1) * 2);
       });
     }
   }, [highlightedNode, sigma, data, currentHighlighted]);
@@ -309,10 +322,11 @@ export default function NetworkGraph({
   }
 
   return (
-    <div style={containerStyle}>
+    <div style={containerStyle} data-testid="network-graph">
       <SigmaContainer
         style={{ width: '100%', height: '100%' }}
         settings={{
+          allowInvalidContainer: true,
           minCameraRatio: ZOOM_MIN,
           maxCameraRatio: ZOOM_MAX,
           renderLabels: false,
