@@ -6,14 +6,13 @@ import json
 import sys
 from pathlib import Path
 
-import jsonschema
 from jsonschema import Draft7Validator
+
+from scripts.validate_json_schema import validate_edges, validate_nodes
 
 # Ensure project root is in path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
-
-from scripts.validate_json_schema import validate_nodes, validate_edges
 
 
 class TestNodesSchema:
@@ -29,9 +28,7 @@ class TestNodesSchema:
 
     def test_schema_file_exists(self):
         """Schema file should exist."""
-        assert self.nodes_schema_path.exists(), (
-            f"Schema not found: {self.nodes_schema_path}"
-        )
+        assert self.nodes_schema_path.exists(), f"Schema not found: {self.nodes_schema_path}"
 
     def test_schema_is_valid_json(self):
         """Schema file should be valid JSON."""
@@ -42,9 +39,7 @@ class TestNodesSchema:
 
     def test_sample_nodes_exist(self):
         """Sample nodes data should exist."""
-        assert self.sample_nodes_path.exists(), (
-            f"Sample nodes not found: {self.sample_nodes_path}"
-        )
+        assert self.sample_nodes_path.exists(), f"Sample nodes not found: {self.sample_nodes_path}"
 
     def test_valid_nodes_pass_validation(self):
         """Valid nodes should pass validation."""
@@ -91,9 +86,7 @@ class TestEdgesSchema:
 
     def test_schema_file_exists(self):
         """Schema file should exist."""
-        assert self.edges_schema_path.exists(), (
-            f"Schema not found: {self.edges_schema_path}"
-        )
+        assert self.edges_schema_path.exists(), f"Schema not found: {self.edges_schema_path}"
 
     def test_schema_is_valid_json(self):
         """Schema file should be valid JSON."""
@@ -104,9 +97,7 @@ class TestEdgesSchema:
 
     def test_sample_edges_exist(self):
         """Sample edges data should exist."""
-        assert self.sample_edges_path.exists(), (
-            f"Sample edges not found: {self.sample_edges_path}"
-        )
+        assert self.sample_edges_path.exists(), f"Sample edges not found: {self.sample_edges_path}"
 
     def test_valid_edges_pass_validation(self):
         """Valid edges should pass validation."""

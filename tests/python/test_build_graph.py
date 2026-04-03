@@ -1,5 +1,5 @@
-import sqlite3
 import os
+import sqlite3
 
 
 def test_db_connection():

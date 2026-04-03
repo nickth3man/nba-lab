@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeAll } from '@jest/globals';
-import { NodeData, EdgeData, TeamTenure, GraphData } from '../../src/lib/graph-types';
+import type { NodeData, EdgeData, TeamTenure, GraphData } from '../../src/lib/graph-types';
 
 // Test suite for NodeData type
 describe('NodeData', () => {

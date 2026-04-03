@@ -2,12 +2,10 @@
 
 import os
 import sqlite3
+import sys
 import tempfile
-from datetime import date
 
 import pytest
-
-import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 from scripts import extract_teammates
@@ -69,9 +67,7 @@ class TestTeammateOverlapSQL:
             "INSERT INTO dim_team VALUES (?, ?)",
             [("TEAM_A", "Team Alpha"), ("TEAM_B", "Team Beta")],
         )
-        cursor.executemany(
-            "INSERT INTO dim_season VALUES (?, ?, ?)", [("S2023", 2023, 2024)]
-        )
+        cursor.executemany("INSERT INTO dim_season VALUES (?, ?, ?)", [("S2023", 2023, 2024)])
 
         # Insert roster data: 3 players on same team (TEAM_A, S2023)
         # P1 and P2 overlap for 14 days (Oct 1 - Oct 15)
@@ -103,9 +99,7 @@ class TestTeammateOverlapSQL:
         extract_teammates.extract_teammate_overlaps(db_path)
 
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='teammate_overlaps'"
-        )
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='teammate_overlaps'")
         result = cursor.fetchone()
         assert result is not None, "teammate_overlaps table should be created"
 
@@ -124,15 +118,9 @@ class TestTeammateOverlapSQL:
 
         player_pairs = {tuple(sorted(e)) for e in edges}
 
-        assert tuple(sorted(["P1", "P2"])) in player_pairs, (
-            "P1-P2 (30 days) should be included"
-        )
-        assert tuple(sorted(["P1", "P3"])) in player_pairs, (
-            "P1-P3 (14 days) should be included"
-        )
-        assert tuple(sorted(["P2", "P3"])) not in player_pairs, (
-            "P2-P3 (0 days) should NOT be included"
-        )
+        assert tuple(sorted(["P1", "P2"])) in player_pairs, "P1-P2 (30 days) should be included"
+        assert tuple(sorted(["P1", "P3"])) in player_pairs, "P1-P3 (14 days) should be included"
+        assert tuple(sorted(["P2", "P3"])) not in player_pairs, "P2-P3 (0 days) should NOT be included"
 
     def test_no_self_loops(self, temp_db):
         """Test that player is not paired with themselves."""
@@ -157,9 +145,7 @@ class TestTeammateOverlapSQL:
 
         # Each pair should be unique when sorted
         sorted_pairs = [tuple(sorted(e)) for e in edges]
-        assert len(sorted_pairs) == len(set(sorted_pairs)), (
-            "Should not have duplicate pairs"
-        )
+        assert len(sorted_pairs) == len(set(sorted_pairs)), "Should not have duplicate pairs"
 
     def test_cross_team_edges_excluded(self, temp_db):
         """Test that teammates on different teams are not paired."""
@@ -167,9 +153,7 @@ class TestTeammateOverlapSQL:
         extract_teammates.extract_teammate_overlaps(db_path)
 
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT COUNT(*) FROM teammate_overlaps WHERE team_id = 'TEAM_B'"
-        )
+        cursor.execute("SELECT COUNT(*) FROM teammate_overlaps WHERE team_id = 'TEAM_B'")
         team_b_edges = cursor.fetchone()[0]
 
         # P1 is on TEAM_B but no one else is, so no edges should involve TEAM_B
@@ -181,9 +165,7 @@ class TestTeammateOverlapSQL:
         extract_teammates.extract_teammate_overlaps(db_path)
 
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='view' AND name='v_teammate_edges'"
-        )
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='view' AND name='v_teammate_edges'")
         result = cursor.fetchone()
         assert result is not None, "v_teammate_edges view should exist"
 
@@ -198,9 +180,7 @@ class TestTeammateOverlapSQL:
         extract_teammates.extract_teammate_overlaps(db_path)
 
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='view' AND name='v_teammate_edges_by_team'"
-        )
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='view' AND name='v_teammate_edges_by_team'")
         result = cursor.fetchone()
         assert result is not None, "v_teammate_edges_by_team view should exist"
 
@@ -215,10 +195,8 @@ class TestTeammateOverlapSQL:
         extract_teammates.create_index(db_path)
 
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_roster_team_season_player'"
-        )
-        result = cursor.fetchone()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='index' AND name='idx_roster_team_season_player'")
+        cursor.fetchone()
         # Index may or may not exist depending on if it was already there
         # Just verify no error is raised
 
@@ -244,9 +222,7 @@ class TestKnownPair:
 
     def test_lebron_wade_miami_overlap(self):
         """Test that LeBron (2544) and Wade (2548) on MIA (1610612748) have an overlap."""
-        db_path = os.path.join(
-            os.path.dirname(__file__), "..", "..", "db", "nba_raw_data.db"
-        )
+        db_path = os.path.join(os.path.dirname(__file__), "..", "..", "db", "nba_raw_data.db")
         if not os.path.exists(db_path):
             pytest.skip("NBA database not available")
 
