@@ -1,11 +1,20 @@
 /** @type {import('jest').Config} */
 const config = {
   testMatch: ['**/tests/js/**/*.test.ts', '**/tests/js/**/*.test.tsx'],
-  preset: 'ts-jest',
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1',
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
+  maxWorkers: '50%',
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        isolatedModules: true,
+        diagnostics: false,
+      },
+    ],
+  },
 };
 
 module.exports = config;
