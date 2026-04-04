@@ -34,3 +34,11 @@ repos:
         language: system
         types_or: [javascript, jsx, ts, tsx, json, css, markdown]
         pass_filenames: true
+
+      - id: typecheck
+        name: typecheck
+        entry: npm run typecheck
+        language: system
+        types_or: [ts, tsx]
+        files: \.(ts|tsx)$
+        pass_filenames: false

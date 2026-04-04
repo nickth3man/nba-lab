@@ -1,0 +1,48 @@
+# Lefthook configuration
+# https://github.com/evilmartians/lefthook
+#
+# Install: npm install -g lefthook
+# Initialize: lefthook install
+#
+# Lefthook is 10x faster than Husky and supports parallel execution
+
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      glob: "*.{js,jsx,ts,tsx,css,md,json,yml,yaml}"
+      run: npx prettier --write --ignore-unknown {staged_files}
+
+    eslint:
+      glob: "*.{js,jsx,ts,tsx}"
+      run: npx eslint --fix {staged_files}
+
+    ruff-check:
+      glob: "*.py"
+      run: uv run ruff check --fix {staged_files}
+
+    ruff-format:
+      glob: "*.py"
+      run: uv run ruff format {staged_files}
+
+pre-push:
+  parallel: true
+  commands:
+    typecheck:
+      run: npm run typecheck
+
+    test-js:
+      run: npm run test:js -- --runInBand
+
+    test-py:
+      run: npm run test:py
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx commitlint --edit {1}
+
+# Optional: Skip hooks in CI
+skip:
+  - ref: refs/remotes/origin/main
+  - ref: refs/remotes/origin/master

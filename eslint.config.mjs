@@ -1,12 +1,12 @@
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
-import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
+import eslintConfigPrettier from "eslint-config-prettier";
 import { defineConfig, globalIgnores } from "eslint/config";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
-  eslintPluginPrettierRecommended,
+  eslintConfigPrettier,
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
 
   // Source files: enforce line limits

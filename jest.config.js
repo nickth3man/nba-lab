@@ -15,6 +15,23 @@ const config = {
       },
     ],
   },
+  coverageDirectory: "coverage",
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/**/*.test.{ts,tsx}",
+    "!src/app/layout.tsx",
+    "!src/**/index.ts",
+  ],
+  coverageReporters: ["text", "text-summary", "html", "lcov"],
+  coverageThreshold: {
+    global: {
+      branches: 50,
+      functions: 50,
+      lines: 50,
+      statements: 50,
+    },
+  },
 };
 
 module.exports = config;
