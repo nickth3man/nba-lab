@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import PlayerTooltip from "@/components/PlayerTooltip";
 import type { GraphData, NodeData, EdgeData } from "@/lib/graph-types";

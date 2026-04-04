@@ -6,6 +6,7 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
 from jsonschema import Draft7Validator
 
 from scripts.validate_json_schema import validate_edges, validate_nodes
@@ -13,6 +14,63 @@ from scripts.validate_json_schema import validate_edges, validate_nodes
 # Ensure project root is in path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
+
+
+# Sample data constants
+SAMPLE_NODES = [
+    {
+        "id": "player_001",
+        "label": "Test Player 1",
+        "x": 100.0,
+        "y": 200.0,
+        "size": 15,
+        "color": "#FF5733",
+        "position": "PG",
+        "era": "2020s",
+        "is_active": True,
+        "hof": False,
+        "draft_year": 2020,
+        "degree": 25,
+        "betweenness": 0.15,
+        "community": 1,
+    },
+    {
+        "id": "player_002",
+        "label": "Test Player 2",
+        "x": 150.0,
+        "y": 250.0,
+        "size": 12,
+        "color": "#33FF57",
+        "position": "SG",
+        "era": "2010s",
+        "is_active": False,
+        "hof": True,
+        "draft_year": 2015,
+        "degree": 18,
+        "betweenness": 0.08,
+        "community": 2,
+    },
+]
+
+SAMPLE_EDGES = [
+    {
+        "id": "edge_001",
+        "source": "player_001",
+        "target": "player_002",
+        "weight": 3.5,
+        "teams": [
+            {
+                "team_id": "LAL",
+                "team_name": "Los Angeles Lakers",
+                "team_abbreviation": "LAL",
+                "seasons": ["2020-21", "2021-22", "2022-23"],
+                "overlap_days": 365,
+            },
+        ],
+        "total_days": 365,
+        "size": 8,
+    },
+]
 
 
 class TestNodesSchema:
@@ -24,7 +82,10 @@ class TestNodesSchema:
 
     @property
     def sample_nodes_path(self) -> Path:
-        return project_root / "data" / "sample_nodes.json"
+        data_path = project_root / "data" / "sample_nodes.json"
+        if data_path.exists():
+            return data_path
+        raise FileNotFoundError(f"Sample nodes not found: {data_path}")
 
     def test_schema_file_exists(self):
         """Schema file should exist."""
@@ -50,7 +111,6 @@ class TestNodesSchema:
         """Nodes schema should require id field."""
         with open(self.nodes_schema_path) as f:
             schema = json.load(f)
-        # Get the item schema from the array
         item_schema = schema.get("items", {})
         required = item_schema.get("required", [])
         assert "id" in required, "id should be required"
@@ -82,7 +142,10 @@ class TestEdgesSchema:
 
     @property
     def sample_edges_path(self) -> Path:
-        return project_root / "data" / "sample_edges.json"
+        data_path = project_root / "data" / "sample_edges.json"
+        if data_path.exists():
+            return data_path
+        raise FileNotFoundError(f"Sample edges not found: {data_path}")
 
     def test_schema_file_exists(self):
         """Schema file should exist."""
@@ -144,7 +207,6 @@ class TestInvalidData:
         """Missing required field should fail validation."""
         invalid_nodes = [
             {
-                # Missing 'id' and other required fields
                 "label": "Test Player",
                 "x": 100,
                 "y": 200,
@@ -167,7 +229,7 @@ class TestInvalidData:
                 "x": 100,
                 "y": 200,
                 "size": 10,
-                "color": "not-a-hex-color",  # Invalid
+                "color": "not-a-hex-color",
                 "position": "PG",
                 "era": "2020s",
                 "is_active": True,
@@ -193,7 +255,7 @@ class TestInvalidData:
                 "id": "test",
                 "source": "p1",
                 "target": "p2",
-                "weight": -1,  # Invalid - should be >= 0
+                "weight": -1,
                 "teams": [],
                 "total_days": 100,
                 "size": 5,
@@ -206,3 +268,33 @@ class TestInvalidData:
         validator = Draft7Validator(schema)
         errors = list(validator.iter_errors(invalid_edges))
         assert len(errors) > 0, "Negative weight should produce validation errors"
+
+
+# Fixtures for schema validation tests
+@pytest.fixture
+def valid_sample_nodes_path(tmp_path: Path) -> Path:
+    sample_file = tmp_path / "sample_nodes.json"
+    sample_file.write_text(json.dumps(SAMPLE_NODES, indent=2))
+    return sample_file
+
+
+@pytest.fixture
+def valid_sample_edges_path(tmp_path: Path) -> Path:
+    sample_file = tmp_path / "sample_edges.json"
+    sample_file.write_text(json.dumps(SAMPLE_EDGES, indent=2))
+    return sample_file
+
+
+@pytest.fixture(autouse=True)
+def schema_test_project_root(sample_data_dir: Path, monkeypatch: pytest.MonkeyPatch):
+    """Override sample_nodes_path and sample_edges_path to use temp data dir."""
+    import test_graph_schema
+
+    def patched_nodes_path(self: test_graph_schema.TestNodesSchema) -> Path:
+        return sample_data_dir / "sample_nodes.json"
+
+    def patched_edges_path(self: test_graph_schema.TestEdgesSchema) -> Path:
+        return sample_data_dir / "sample_edges.json"
+
+    monkeypatch.setattr(test_graph_schema.TestNodesSchema, "sample_nodes_path", property(patched_nodes_path))
+    monkeypatch.setattr(test_graph_schema.TestEdgesSchema, "sample_edges_path", property(patched_edges_path))

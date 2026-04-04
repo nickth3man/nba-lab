@@ -14,28 +14,31 @@ const MAX_RESULTS = 100;
 
 export default function SearchBar({ data, onSelect }: SearchBarProps) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<NodeData[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<NodeData[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
+  const trimmed = query.trim();
+  const results = trimmed ? searchResults : [];
+  const isOpen = trimmed !== "";
+
   useEffect(() => {
+    if (!trimmed) {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+      return;
+    }
+
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
 
-    if (!query.trim()) {
-      setResults([]);
-      setIsOpen(false);
-      return;
-    }
-
     debounceRef.current = setTimeout(() => {
-      const searchResults = searchPlayers(data, query);
-      setResults(searchResults.slice(0, MAX_RESULTS));
-      setIsOpen(true);
+      const found = searchPlayers(data, query);
+      setSearchResults(found.slice(0, MAX_RESULTS));
       setSelectedIndex(-1);
     }, DEBOUNCE_MS);
 
@@ -44,12 +47,12 @@ export default function SearchBar({ data, onSelect }: SearchBarProps) {
         clearTimeout(debounceRef.current);
       }
     };
-  }, [query, data]);
+  }, [query, data, trimmed]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setQuery("");
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -74,15 +77,14 @@ export default function SearchBar({ data, onSelect }: SearchBarProps) {
       const selected = results[selectedIndex];
       if (selected) selectPlayer(selected);
     } else if (e.key === "Escape") {
-      setIsOpen(false);
+      setQuery("");
     }
   };
 
   const selectPlayer = (player: NodeData) => {
     onSelect(player.id);
     setQuery("");
-    setResults([]);
-    setIsOpen(false);
+    setSearchResults([]);
     setSelectedIndex(-1);
     inputRef.current?.focus();
   };

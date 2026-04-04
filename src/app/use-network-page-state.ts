@@ -4,9 +4,9 @@ import { useState, useCallback } from "react";
 import type { GraphData, NodeData } from "@/lib/graph-types";
 
 export function useNetworkPageState() {
-  const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
+  const [, setHoveredNodeId] = useState<string | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [hoveredNodeData, setHoveredNodeData] = useState<NodeData | null>(null);
+  const [, setHoveredNodeData] = useState<NodeData | null>(null);
   const [selectedNodeData, setSelectedNodeData] = useState<NodeData | null>(null);
   const [fullGraphData, setFullGraphData] = useState<GraphData | null>(null);
   const [graphData, setGraphData] = useState<GraphData | null>(null);

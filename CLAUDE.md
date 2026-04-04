@@ -123,16 +123,19 @@ max 100 chars.
 ## Boundaries
 
 ### Allowed without asking
+
 - Read files, list directory contents
 - Run lint, typecheck, and individual test files
 - Refactor within a single module
 
 ### Ask first
+
 - Install or remove dependencies
 - Delete files
 - Changes spanning more than 3 modules
 
 ### Never
+
 - Commit secrets, `.env` files, or credentials
 - Force push to main or protected branches
 - Modify generated directories: `data/`, `out/`, `.next/`, `build/`

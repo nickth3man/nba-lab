@@ -4,22 +4,22 @@
  */
 
 import React from "react";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Filters from "@/components/Filters";
-import { filterByEra, filterByTeam, filterByPosition } from "@/lib/graph-data";
-import type { GraphData, NodeData, EdgeData, TeamTenure } from "@/lib/graph-types";
+import { filterByEra, filterByTeam, filterByPositions } from "@/lib/graph-data";
+import type { GraphData, NodeData, EdgeData } from "@/lib/graph-types";
 
 // Mock graph-data module
 jest.mock("@/lib/graph-data", () => ({
   filterByEra: jest.fn(),
   filterByTeam: jest.fn(),
-  filterByPosition: jest.fn(),
+  filterByPositions: jest.fn(),
 }));
 
 const mockFilterByEra = filterByEra as jest.MockedFunction<typeof filterByEra>;
 const mockFilterByTeam = filterByTeam as jest.MockedFunction<typeof filterByTeam>;
-const mockFilterByPosition = filterByPosition as jest.MockedFunction<typeof filterByPosition>;
+const mockFilterByPositions = filterByPositions as jest.MockedFunction<typeof filterByPositions>;
 
 // Era buckets
 const ERA_BUCKETS = ["1940s-1950s", "1960s", "1970s", "1980s", "1990s", "2000s", "2010s", "2020s"];
@@ -79,21 +79,6 @@ const createMockNode = (id: string, overrides: Partial<NodeData> = {}): NodeData
   ...overrides,
 });
 
-const createMockEdge = (
-  id: string,
-  source: string,
-  target: string,
-  teams: TeamTenure[] = [],
-): EdgeData => ({
-  id,
-  source,
-  target,
-  weight: 1,
-  teams,
-  total_days: 100,
-  size: 5,
-});
-
 const createMockGraphData = (nodes: NodeData[], edges: EdgeData[] = []): GraphData => ({
   nodes,
   edges,
@@ -105,7 +90,7 @@ describe("Filters Component", () => {
     // Default mock implementations - return input data unchanged
     mockFilterByEra.mockImplementation((data) => data);
     mockFilterByTeam.mockImplementation((data) => data);
-    mockFilterByPosition.mockImplementation((data) => data);
+    mockFilterByPositions.mockImplementation((data) => data);
   });
 
   describe("Rendering", () => {
@@ -132,7 +117,6 @@ describe("Filters Component", () => {
       const mockData = createMockGraphData([]);
       render(<Filters data={mockData} onFilterChange={jest.fn()} />);
 
-      const eraSelect = screen.getByLabelText(/era/i) as HTMLSelectElement;
       ERA_BUCKETS.forEach((era) => {
         expect(screen.getByRole("option", { name: era })).toBeInTheDocument();
       });
@@ -261,7 +245,7 @@ describe("Filters Component", () => {
       });
     });
 
-    it("calls filterByPosition when position is toggled", () => {
+    it("calls filterByPositions when position is toggled", () => {
       const mockData = createMockGraphData([createMockNode("1", { position: "PG" })]);
       const onFilterChange = jest.fn();
       render(<Filters data={mockData} onFilterChange={onFilterChange} />);
@@ -269,13 +253,13 @@ describe("Filters Component", () => {
       const pgCheckbox = screen.getByRole("checkbox", { name: "PG" });
       fireEvent.click(pgCheckbox);
 
-      expect(mockFilterByPosition).toHaveBeenCalledWith(mockData, "PG");
+      expect(mockFilterByPositions).toHaveBeenCalledWith(mockData, ["PG"]);
     });
 
     it("triggers onFilterChange with filtered data when position is selected", () => {
       const mockData = createMockGraphData([createMockNode("1", { position: "PG" })]);
       const filteredData = createMockGraphData([createMockNode("1", { position: "PG" })]);
-      mockFilterByPosition.mockReturnValue(filteredData);
+      mockFilterByPositions.mockReturnValue(filteredData);
       const onFilterChange = jest.fn();
       render(<Filters data={mockData} onFilterChange={onFilterChange} />);
 
@@ -298,12 +282,12 @@ describe("Filters Component", () => {
       fireEvent.click(pgCheckbox);
       fireEvent.click(sgCheckbox);
 
-      // With PG and SG selected, filterByPosition is called twice in the AND chain
+      // With PG and SG selected, filterByPositions is called twice in the AND chain
       // First for PG (when selected), then for SG (when selected)
-      // PG adds: filterByPosition(data, 'PG')
-      // SG adds: filterByPosition(result, 'PG') and filterByPosition(result, 'SG')
-      // So 3 total calls to filterByPosition
-      expect(mockFilterByPosition).toHaveBeenCalledTimes(3);
+      // PG adds: filterByPositions(data, 'PG')
+      // SG adds: filterByPositions(result, 'PG') and filterByPositions(result, 'SG')
+      // So 3 total calls to filterByPositions
+      expect(mockFilterByPositions).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -340,7 +324,7 @@ describe("Filters Component", () => {
 
       mockFilterByEra.mockReturnValue(eraFiltered);
       mockFilterByTeam.mockReturnValue(teamFiltered);
-      mockFilterByPosition.mockReturnValue(positionFiltered);
+      mockFilterByPositions.mockReturnValue(positionFiltered);
 
       const onFilterChange = jest.fn();
       render(<Filters data={mockData} onFilterChange={onFilterChange} />);
@@ -360,7 +344,7 @@ describe("Filters Component", () => {
       // Filters should be chained: data -> era -> team -> position
       expect(mockFilterByEra).toHaveBeenCalledWith(mockData, "1990s");
       expect(mockFilterByTeam).toHaveBeenCalledWith(eraFiltered, "LAL");
-      expect(mockFilterByPosition).toHaveBeenCalledWith(teamFiltered, "PG");
+      expect(mockFilterByPositions).toHaveBeenCalledWith(teamFiltered, ["PG"]);
     });
 
     it("returns empty data when no nodes match combined filters", () => {

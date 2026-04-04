@@ -2,7 +2,7 @@
  * TypeScript type tests for graph schema types
  */
 
-import { describe, it, expect, beforeAll } from "@jest/globals";
+import { describe, it, expect } from "@jest/globals";
 import type { NodeData, EdgeData, TeamTenure, GraphData } from "../../src/lib/graph-types";
 
 // Test suite for NodeData type

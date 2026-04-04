@@ -3,7 +3,7 @@
  * Tests viewport culling, LOD, mobile detection, debouncing, and Web Worker
  */
 
-import type { GraphData, NodeData, EdgeData } from "@/lib/graph-types";
+import type { GraphData } from "@/lib/graph-types";
 
 // Mock sigma for viewport testing
 const createMockSigma = () => {
@@ -389,7 +389,8 @@ describe("Viewport Culling", () => {
     const sigma = createMockSigma() as unknown as SigmaInstance;
     // Mock viewport bounds
     const mockViewport = { x: 50, y: 50, width: 200, height: 200 };
-    (sigma as unknown as { getViewport: () => typeof mockViewport }).getViewport = () => mockViewport;
+    type ViewportType = typeof mockViewport;
+    (sigma as unknown as { getViewport: () => ViewportType }).getViewport = () => mockViewport;
 
     const culler = createViewportCuller(sigma);
     const visibleNodes = culler.getVisibleNodes();
@@ -422,7 +423,8 @@ describe("LOD (Level of Detail)", () => {
 
   test("returns HIGH level at default zoom", () => {
     const sigma = createMockSigma() as unknown as SigmaInstance;
-    sigma.getCamera = () => ({ x: 0, y: 0, ratio: 1 }) as unknown as ReturnType<NonNullable<typeof sigma.getCamera>>;
+    type CameraType = ReturnType<NonNullable<typeof sigma.getCamera>>;
+    sigma.getCamera = () => ({ x: 0, y: 0, ratio: 1 }) as unknown as CameraType;
 
     const lod = createLODManager(sigma);
     expect(lod.getLevel()).toBe("HIGH");
@@ -430,7 +432,8 @@ describe("LOD (Level of Detail)", () => {
 
   test("returns LOW level when zoomed out below threshold", () => {
     const sigma = createMockSigma() as unknown as SigmaInstance;
-    sigma.getCamera = () => ({ x: 0, y: 0, ratio: 0.3 }) as unknown as ReturnType<NonNullable<typeof sigma.getCamera>>;
+    type CameraType = ReturnType<NonNullable<typeof sigma.getCamera>>;
+    sigma.getCamera = () => ({ x: 0, y: 0, ratio: 0.3 }) as unknown as CameraType;
 
     const lod = createLODManager(sigma);
     expect(lod.getLevel()).toBe("LOW");
@@ -438,7 +441,8 @@ describe("LOD (Level of Detail)", () => {
 
   test("returns MEDIUM level at intermediate zoom", () => {
     const sigma = createMockSigma() as unknown as SigmaInstance;
-    sigma.getCamera = () => ({ x: 0, y: 0, ratio: 0.5 }) as unknown as ReturnType<NonNullable<typeof sigma.getCamera>>;
+    type CameraType = ReturnType<NonNullable<typeof sigma.getCamera>>;
+    sigma.getCamera = () => ({ x: 0, y: 0, ratio: 0.5 }) as unknown as CameraType;
 
     const lod = createLODManager(sigma);
     expect(lod.getLevel()).toBe("MEDIUM");
